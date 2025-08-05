@@ -3,7 +3,7 @@
 ## Sistema de Análisis Energético con Control de Usuarios
 
 **Versión:** 2.0 Segura  
-**Autor:** Mario Savard Boies  
+**Autor:** Mario S  
 **Email:** energysavercr@gmail.com  
 **Teléfono:** 8722-6666
 
