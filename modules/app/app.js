@@ -1,10 +1,10 @@
 // EnergySaverApp - Orchestrazione e UI Management
 import CONFIG from "../config/config.js";
-import AuthModule from "./auth/auth.js";
-import FileManager from "./filemanager/filemanager.js";
-import OCRProcessor from "./ocr/ocr.js";
-import AnalysisEngine from "./analysis/analysis.js";
-import DocumentGenerator from "./documents/documents.js";
+import AuthModule from "../auth/auth.js";
+import FileManager from "../filemanager/filemanager.js";
+import OCRProcessor from "../ocr/ocr.js";
+import AnalysisEngine from "../analysis/analysis.js";
+import DocumentGenerator from "../documents/documents.js";
 import HealthMonitor from "../monitoring/health.js";
 
 class EnergySaverApp {

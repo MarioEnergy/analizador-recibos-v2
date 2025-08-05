@@ -9,7 +9,7 @@ class AuthModule {
         this.currentUser = null;
     }
 
-        function handleLogin() {
+    handleLogin() {
             const startTime = Date.now();
             const email = document.getElementById('login-email').value.trim();
             const password = document.getElementById('login-password').value.trim();
