@@ -1314,11 +1314,11 @@ Energy Saver Costa Rica - Tel: 8722-6666
                 ['Ganancia neta 5 años (₡)', (currentAnalysis.ahorroTotal * 60) - currentAnalysis.totalEquipo]
             ];
 
-            const ws = XLSX.utils.aoa_to_sheet(data);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'Análisis Energético');
+            const ws = //XLSX.utils.aoa_to_sheet(data);
+            const wb = //XLSX.utils.book_new();
+            //XLSX.utils.book_append_sheet(wb, ws, 'Análisis Energético');
 
-            XLSX.writeFile(wb, `Analisis_${currentAnalysis.cliente.nombre.replace(/\s+/g, '_')}_${Date.now()}.xlsx`);
+            //XLSX.writeFile(wb, `Analisis_${currentAnalysis.cliente.nombre.replace(/\s+/g, '_')}_${Date.now()}.xlsx`);
         }
 
         function exportToWord() {
@@ -1652,15 +1652,15 @@ WhatsApp: 8722-6666
                 ]);
             });
 
-            const ws = XLSX.utils.aoa_to_sheet(data);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'Historial');
+            const ws = //XLSX.utils.aoa_to_sheet(data);
+            const wb = //XLSX.utils.book_new();
+            //XLSX.utils.book_append_sheet(wb, ws, 'Historial');
 
             const filename = currentUser.isAdmin ? 
                 `Historial_Completo_${Date.now()}.xlsx` : 
                 `Historial_${currentUser.name.replace(/\s+/g, '_')}_${Date.now()}.xlsx`;
 
-            XLSX.writeFile(wb, filename);
+            //XLSX.writeFile(wb, filename);
         }
 
         function exportSingleAnalysis(id) {
@@ -1687,11 +1687,11 @@ WhatsApp: 8722-6666
                 ['ROI meses', analysis.roiMeses]
             ];
 
-            const ws = XLSX.utils.aoa_to_sheet(data);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'Análisis');
+            const ws = //XLSX.utils.aoa_to_sheet(data);
+            const wb = //XLSX.utils.book_new();
+            //XLSX.utils.book_append_sheet(wb, ws, 'Análisis');
 
-            XLSX.writeFile(wb, `Analisis_${analysis.cliente.nombre.replace(/\s+/g, '_')}_${Date.now()}.xlsx`);
+            //XLSX.writeFile(wb, `Analisis_${analysis.cliente.nombre.replace(/\s+/g, '_')}_${Date.now()}.xlsx`);
         }
 
         function createVendor() {
