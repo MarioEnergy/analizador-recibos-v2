@@ -1,27 +1,1849 @@
-<!DOCTYPE html>
+l<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Test Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔋 Energy Saver Costa Rica - Sistema Profesional V4.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .card-shadow { box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .drag-area { transition: all 0.3s ease; }
+        .drag-active { background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%); border: 2px dashed #667eea; }
+        .analysis-pulse { animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+        .equipo-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .equipo-card:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(0,0,0,0.15); }
+        .pay-button { background: linear-gradient(45deg, #4CAF50, #45a049); }
+        .pay-button:hover { background: linear-gradient(45deg, #45a049, #4CAF50); }
+        .search-box { transition: all 0.3s ease; }
+        .search-box:focus { box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        .sortable-header { cursor: pointer; user-select: none; }
+        .sortable-header:hover { background-color: #f3f4f6; }
+    </style>
 </head>
-<body>
-    <h1>Test Energy Saver</h1>
-    <input type="email" id="email" placeholder="Email">
-    <input type="password" id="password" placeholder="Password">
-    <button onclick="testLogin()">LOGIN TEST</button>
-    
+<body class="bg-gray-50">
+    <!-- Login Screen -->
+    <div id="login-screen" class="min-h-screen gradient-bg flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl card-shadow p-8 w-full max-w-md">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">🔋 Energy Saver</h1>
+                <p class="text-gray-600">Costa Rica - Sistema Profesional V4.0</p>
+            </div>
+
+            <!-- Manual Login -->
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input type="email" id="login-email" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="usuario@email.com">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                    <input type="password" id="login-password" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="••••••••">
+                </div>
+                <button id="manual-login-btn" class="w-full bg-blue-600 text-white p-3 rounded-lg font-medium hover:bg-blue-700 transition-colors">
+                    Iniciar Sesión
+                </button>
+            </div>
+
+            <div class="mt-6 text-center">
+                <div class="text-sm text-gray-500 bg-blue-50 p-3 rounded-lg">
+                    <strong>Credenciales Mario (Admin):</strong><br>
+                    mariosavardenergysaver@gmail.com<br>
+                    mario123
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="dashboard" class="hidden min-h-screen bg-gray-50">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+                    <div class="flex items-center space-x-4">
+                        <h1 class="text-xl font-semibold text-gray-900">🔋 Energy Saver Costa Rica</h1>
+                        <span id="user-badge" class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium"></span>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div id="analysis-counter" class="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full"></div>
+                        <button id="logout-btn" class="text-gray-500 hover:text-gray-700 font-medium">Cerrar Sesión</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="bg-white shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex space-x-8">
+                    <button id="nav-nuevo" class="py-4 px-1 border-b-2 border-blue-500 text-blue-600 font-medium">Nuevo Análisis</button>
+                    <button id="nav-historial" class="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium">Historial</button>
+                    <button id="nav-admin" class="py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium hidden">Admin</button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Nuevo Análisis Tab -->
+            <div id="tab-nuevo" class="space-y-8">
+                <!-- Cliente Info -->
+                <div class="bg-white rounded-xl card-shadow p-6">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">📋 Información del Cliente</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre Completo</label>
+                            <input type="text" id="cliente-nombre" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Juan Pérez">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+                            <input type="tel" id="cliente-telefono" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="8888-8888">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                            <input type="email" id="cliente-email" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="cliente@email.com">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Cliente</label>
+                            <select id="cliente-tipo" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <option value="residencial">Residencial</option>
+                                <option value="comercial-pequeño">Comercial Pequeño</option>
+                                <option value="comercial-mediano">Comercial Mediano</option>
+                                <option value="comercial-grande">Comercial Grande</option>
+                                <option value="industrial">Industrial</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upload Area -->
+                <div class="bg-white rounded-xl card-shadow p-6">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">📁 Subir Recibos Eléctricos</h2>
+                    <div id="upload-area" class="drag-area border-2 border-dashed border-gray-300 rounded-xl p-8 text-center bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer">
+                        <div class="space-y-4">
+                            <div class="text-4xl">📄</div>
+                            <div>
+                                <p class="text-lg font-medium text-gray-700">Arrastra tus recibos aquí</p>
+                                <p class="text-sm text-gray-500">o haz clic para seleccionar archivos</p>
+                                <p class="text-xs text-gray-400 mt-2">JPG, PNG, PDF - Máximo 5MB cada uno - 3-6 archivos recomendados</p>
+                            </div>
+                            <button type="button" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors">
+                                Seleccionar Archivos
+                            </button>
+                        </div>
+                    </div>
+                    <input type="file" id="file-input" class="hidden" multiple accept=".jpg,.jpeg,.png,.pdf">
+                    
+                    <!-- Files Preview -->
+                    <div id="files-preview" class="mt-4 space-y-2 hidden">
+                        <h3 class="font-medium text-gray-700">Archivos seleccionados:</h3>
+                        <div id="files-list" class="space-y-2"></div>
+                    </div>
+                </div>
+
+                <!-- Análisis Button -->
+                <div class="text-center">
+                    <button id="start-analysis" class="bg-green-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed" disabled>
+                        🚀 Iniciar Análisis Energético
+                    </button>
+                </div>
+            </div>
+
+            <!-- Análisis Results -->
+            <div id="analysis-results" class="hidden space-y-8">
+                <div class="text-center">
+                    <button id="new-analysis-btn" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors">
+                        ← Nuevo Análisis
+                    </button>
+                </div>
+
+                <!-- Client Summary -->
+                <div class="bg-white rounded-xl card-shadow p-6">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">📊 Resumen del Cliente</h2>
+                    <div id="client-summary" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+                </div>
+
+                <!-- Current Situation -->
+                <div class="bg-white rounded-xl card-shadow p-6">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">⚡ Situación Energética Actual</h2>
+                    <div id="current-situation" class="grid grid-cols-1 md:grid-cols-4 gap-4"></div>
+                </div>
+
+                <!-- Recommended Equipment -->
+                <div class="bg-white rounded-xl card-shadow p-6">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">🔧 Equipo Recomendado</h2>
+                    <div id="recommended-equipment"></div>
+                </div>
+
+                <!-- Financial Plan -->
+                <div class="bg-white rounded-xl card-shadow p-6">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">💰 Plan de Financiamiento</h2>
+                    <div id="financial-plan" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+                </div>
+
+                <!-- Savings Projection -->
+                <div class="bg-white rounded-xl card-shadow p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-semibold text-gray-900">📈 Proyección de Ahorros</h2>
+                        <div class="flex items-center space-x-3">
+                            <span class="text-sm text-gray-600">Prima en cálculo:</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="prima-toggle" class="sr-only peer" checked>
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                            </label>
+                            <span id="prima-status" class="text-sm font-medium text-blue-600">ON</span>
+                        </div>
+                    </div>
+                    <div id="savings-projection" class="space-y-4"></div>
+                </div>
+
+                <!-- Actions -->
+                <div class="text-center space-x-4 flex-wrap justify-center">
+                    <button id="generate-pagare" class="pay-button text-white px-8 py-4 rounded-xl font-bold text-lg hover:shadow-lg transition-all mb-2">
+                        📄 GENERAR PAGARÉ
+                    </button>
+                    <button id="pay-now" class="bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 transition-colors mb-2">
+                        💳 Procesar Pago
+                    </button>
+                    <button id="generate-proposal" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors mb-2">
+                        📋 Propuesta
+                    </button>
+                    <button id="export-excel" class="bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 transition-colors mb-2">
+                        📊 Excel
+                    </button>
+                    <button id="export-word" class="bg-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-purple-700 transition-colors mb-2">
+                        📝 Word
+                    </button>
+                    <button id="share-whatsapp" class="bg-green-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-600 transition-colors mb-2">
+                        💬 WhatsApp
+                    </button>
+                </div>
+            </div>
+
+            <!-- Historial Tab -->
+            <div id="tab-historial" class="hidden">
+                <div class="bg-white rounded-xl card-shadow p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-semibold text-gray-900">📋 Historial de Análisis</h2>
+                        <div class="flex space-x-4">
+                            <input type="text" id="search-historial" class="search-box p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="🔍 Buscar cliente, vendedor o fecha...">
+                            <select id="sort-historial" class="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                <option value="fecha-desc">Fecha (Más reciente)</option>
+                                <option value="fecha-asc">Fecha (Más antigua)</option>
+                                <option value="cliente-asc">Cliente (A-Z)</option>
+                                <option value="cliente-desc">Cliente (Z-A)</option>
+                                <option value="vendedor-asc" id="sort-vendedor-asc" class="hidden">Vendedor (A-Z)</option>
+                                <option value="vendedor-desc" id="sort-vendedor-desc" class="hidden">Vendedor (Z-A)</option>
+                            </select>
+                            <button id="export-historial" class="bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 transition-colors">
+                                📊 Exportar Todo
+                            </button>
+                        </div>
+                    </div>
+                    <div id="historial-list" class="space-y-4">
+                        <p class="text-gray-500 text-center py-8">No hay análisis previos</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Tab -->
+            <div id="tab-admin" class="hidden">
+                <div class="bg-white rounded-xl card-shadow p-6">
+                    <h2 class="text-xl font-semibold text-gray-900 mb-4">👑 Panel de Administración</h2>
+                    <div class="space-y-6">
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-900 mb-3">Crear Nuevo Vendedor</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <input type="email" id="new-vendor-email" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="email@vendedor.com">
+                                <input type="text" id="new-vendor-name" class="p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Nombre Vendedor">
+                                <button id="create-vendor" class="bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 transition-colors">Crear Vendedor</button>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-900 mb-3">Vendedores Registrados</h3>
+                            <div id="vendors-list" class="space-y-2">
+                                <p class="text-gray-500">Cargando vendedores...</p>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-900 mb-3">Estadísticas del Sistema</h3>
+                            <div id="system-stats" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                                <div class="bg-blue-50 p-4 rounded-lg text-center">
+                                    <div class="text-2xl font-bold text-blue-600" id="total-analysis">0</div>
+                                    <div class="text-sm text-gray-600">Total Análisis</div>
+                                </div>
+                                <div class="bg-green-50 p-4 rounded-lg text-center">
+                                    <div class="text-2xl font-bold text-green-600" id="total-vendors">0</div>
+                                    <div class="text-sm text-gray-600">Vendedores Activos</div>
+                                </div>
+                                <div class="bg-purple-50 p-4 rounded-lg text-center">
+                                    <div class="text-2xl font-bold text-purple-600" id="total-revenue">₡0</div>
+                                    <div class="text-sm text-gray-600">Ingresos Proyectados</div>
+                                </div>
+                                <div class="bg-yellow-50 p-4 rounded-lg text-center">
+                                    <div class="text-2xl font-bold text-yellow-600" id="avg-roi">0</div>
+                                    <div class="text-sm text-gray-600">ROI Promedio (meses)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Loading Modal -->
+    <div id="loading-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-xl p-8 text-center">
+            <div class="analysis-pulse text-4xl mb-4">🔄</div>
+            <h3 class="text-lg font-semibold text-gray-900 mb-2">Analizando Recibos...</h3>
+            <p class="text-gray-600">Extrayendo datos y calculando ahorros</p>
+            <div class="w-full bg-gray-200 rounded-full h-2 mt-4">
+                <div id="progress-bar" class="bg-blue-600 h-2 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div id="payment-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-xl p-8 w-full max-w-2xl">
+            <div class="text-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-900 mb-2">💳 Procesamiento de Pago</h3>
+                <p class="text-gray-600">Energy Saver Costa Rica</p>
+            </div>
+            <div id="payment-content" class="space-y-6">
+                <!-- Payment details will be inserted here -->
+            </div>
+            <div class="flex justify-center space-x-4 mt-8">
+                <button id="confirm-payment" class="pay-button text-white px-8 py-3 rounded-lg font-bold hover:shadow-lg transition-all">
+                    Confirmar Pago
+                </button>
+                <button id="cancel-payment" class="bg-gray-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-600 transition-colors">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        function testLogin() {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            
-            if (email === 'mariosavardenergysaver@gmail.com' && password === 'mario123') {
-                alert('¡LOGIN FUNCIONA!');
-                document.body.innerHTML = '<h1>¡SISTEMA ENERGY SAVER FUNCIONANDO!</h1>';
-            } else {
-                alert('Credenciales incorrectas');
+        // Global Variables
+        let currentUser = null;
+        let analysisCount = 0;
+        let dailyLimit = 50;
+        let uploadedFiles = [];
+        let currentAnalysis = null;
+        let allAnalysis = [];
+        let filteredAnalysis = [];
+
+        // Equipment Database - PRECIOS CORREGIDOS DEL MANUAL
+        const equipos = {
+            'JS-1299': {
+                name: 'JS-1299',
+                description: 'Residencial/Comercial Pequeño',
+                minFactura: 200000,
+                maxFactura: 400000,
+                precio: 3200, // CORREGIDO: $3,200
+                instalacion: 500,
+                prima: 1100,
+                cuotaUSD: 128
+            },
+            'JS-1699': {
+                name: 'JS-1699',
+                description: 'Comercial Mediano',
+                minFactura: 401000,
+                maxFactura: 600000,
+                precio: 4000, // CORREGIDO: $4,000
+                instalacion: 500,
+                prima: 1300,
+                cuotaUSD: 158
+            },
+            'JS-2099': {
+                name: 'JS-2099',
+                description: 'Comercial Grande',
+                minFactura: 601000,
+                maxFactura: 850000,
+                precio: 4600, // CORREGIDO: $4,600
+                instalacion: 500,
+                prima: 1500,
+                cuotaUSD: 178
+            },
+            'JS-2499': {
+                name: 'JS-2499',
+                description: 'Industrial',
+                minFactura: 851000,
+                maxFactura: 1200000, // CORREGIDO: hasta ₡1.2M
+                precio: 5200, // CORRECTO: $5,200
+                instalacion: 500,
+                prima: 1750,
+                cuotaUSD: 195
+            }
+        };
+
+        // Exchange Rate - ACTUALIZADO
+        const TC_BCCR = 512; // Se debe actualizar desde BCCR API
+
+        // Company Data for PAGARÉ
+        const companyData = {
+            name: 'ENERGY SAVER, SOCIEDAD ANÓNIMA',
+            cedula: '3-101-577450',
+            representante: 'MARIO SAVARD BOIES',
+            notario: 'LICDA. CAROLINA SOTO ZÚÑIGA',
+            notarioCarne: '24535',
+            bancoUSD: {
+                cuenta: '100-02-119-000012-0',
+                iban: 'CR49015111910020000127',
+                banco: 'BANCO NACIONAL DE COSTA RICA'
+            },
+            bancoCRC: {
+                cuenta: '100-01-119-000019-1',
+                iban: 'CR12015111910010000190',
+                banco: 'BANCO NACIONAL DE COSTA RICA'
+            },
+            contacto: {
+                telefono: '8722-6666',
+                email: 'energysavercr@gmail.com',
+                whatsapp: '8722-6666'
+            }
+        };
+
+        // Initialize Application
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+        });
+
+        function initializeApp() {
+            setupEventListeners();
+            checkLoginStatus();
+        }
+
+        function setupEventListeners() {
+            // Login
+            document.getElementById('manual-login-btn').addEventListener('click', handleLogin);
+            document.getElementById('login-password').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') handleLogin();
+            });
+
+            // Navigation
+            document.getElementById('nav-nuevo').addEventListener('click', () => showTab('nuevo'));
+            document.getElementById('nav-historial').addEventListener('click', () => showTab('historial'));
+            document.getElementById('nav-admin').addEventListener('click', () => showTab('admin'));
+
+            // Logout
+            document.getElementById('logout-btn').addEventListener('click', logout);
+
+            // File Upload
+            const uploadArea = document.getElementById('upload-area');
+            const fileInput = document.getElementById('file-input');
+
+            uploadArea.addEventListener('click', () => fileInput.click());
+            uploadArea.addEventListener('dragover', handleDragOver);
+            uploadArea.addEventListener('dragleave', handleDragLeave);
+            uploadArea.addEventListener('drop', handleDrop);
+            fileInput.addEventListener('change', handleFileSelect);
+
+            // Analysis
+            document.getElementById('start-analysis').addEventListener('click', startAnalysis);
+            document.getElementById('new-analysis-btn').addEventListener('click', () => showTab('nuevo'));
+
+            // Results Actions
+            document.getElementById('generate-pagare').addEventListener('click', generatePagare);
+            document.getElementById('pay-now').addEventListener('click', showPaymentModal);
+            document.getElementById('generate-proposal').addEventListener('click', generateProposal);
+            document.getElementById('export-excel').addEventListener('click', exportToExcel);
+            document.getElementById('export-word').addEventListener('click', exportToWord);
+            document.getElementById('share-whatsapp').addEventListener('click', shareWhatsApp);
+
+            // Prima Toggle
+            document.getElementById('prima-toggle').addEventListener('change', updateSavingsCalculation);
+
+            // Admin
+            document.getElementById('create-vendor').addEventListener('click', createVendor);
+
+            // Historial
+            document.getElementById('search-historial').addEventListener('input', filterHistorial);
+            document.getElementById('sort-historial').addEventListener('change', sortHistorial);
+            document.getElementById('export-historial').addEventListener('click', exportHistorial);
+
+            // Payment Modal
+            document.getElementById('confirm-payment').addEventListener('click', processPayment);
+            document.getElementById('cancel-payment').addEventListener('click', hidePaymentModal);
+        }
+
+        function checkLoginStatus() {
+            const savedUser = localStorage.getItem('energySaverUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                showDashboard();
             }
         }
+
+        function handleLogin() {
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value.trim();
+
+            if (!email || !password) {
+                alert('Por favor ingresa email y password');
+                return;
+            }
+
+            // Check if it's Mario (Admin)
+            if (email === 'mariosavardenergysaver@gmail.com' && password === 'mario123') {
+                currentUser = {
+                    email: email,
+                    name: 'Mario Savard Boies',
+                    role: 'admin',
+                    isAdmin: true,
+                    dailyLimit: -1 // Unlimited for admin
+                };
+                localStorage.setItem('energySaverUser', JSON.stringify(currentUser));
+                showDashboard();
+                return;
+            }
+
+            alert('Credenciales incorrectas');
+        }
+                };
+                localStorage.setItem('energySaverUser', JSON.stringify(currentUser));
+                showDashboard();
+                return;
+            }
+
+            // Check if it's a registered vendor
+            const vendors = JSON.parse(localStorage.getItem('energySaverVendors') || '[]');
+            const vendor = vendors.find(v => v.email === email && v.active && v.approved);
+            
+            if (vendor) {
+                currentUser = {
+                    email: email,
+                    name: vendor.name,
+                    role: 'vendor',
+                    isAdmin: false,
+                    dailyLimit: 50
+                };
+                localStorage.setItem('energySaverUser', JSON.stringify(currentUser));
+                showDashboard();
+                return;
+            }
+
+            alert('Credenciales incorrectas o cuenta no autorizada');
+        }
+
+        function showDashboard() {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+
+            // Update user info
+            document.getElementById('user-badge').textContent = currentUser.name + (currentUser.isAdmin ? ' (Admin)' : '');
+            
+            // Load user's analysis count
+            loadUserAnalysisCount();
+            updateAnalysisCounter();
+
+            // Show/hide admin tab
+            if (currentUser.isAdmin) {
+                document.getElementById('nav-admin').classList.remove('hidden');
+                document.getElementById('sort-vendedor-asc').classList.remove('hidden');
+                document.getElementById('sort-vendedor-desc').classList.remove('hidden');
+            }
+
+            showTab('nuevo');
+        }
+
+        function loadUserAnalysisCount() {
+            const history = JSON.parse(localStorage.getItem('energySaverHistory') || '[]');
+            if (currentUser.isAdmin) {
+                analysisCount = history.length;
+            } else {
+                analysisCount = history.filter(a => a.vendedor === currentUser.name).length;
+            }
+        }
+
+        function updateAnalysisCounter() {
+            const counter = document.getElementById('analysis-counter');
+            if (currentUser.isAdmin) {
+                counter.textContent = 'Análisis: Ilimitados';
+            } else {
+                const today = new Date().toDateString();
+                const todayAnalysis = JSON.parse(localStorage.getItem('energySaverHistory') || '[]')
+                    .filter(a => a.vendedor === currentUser.name && new Date(a.timestamp).toDateString() === today);
+                counter.textContent = `Análisis hoy: ${todayAnalysis.length}/${dailyLimit}`;
+            }
+        }
+
+        function showTab(tab) {
+            // Hide all tabs
+            document.getElementById('tab-nuevo').classList.add('hidden');
+            document.getElementById('tab-historial').classList.add('hidden');
+            document.getElementById('tab-admin').classList.add('hidden');
+            document.getElementById('analysis-results').classList.add('hidden');
+
+            // Remove active class from nav buttons
+            document.querySelectorAll('nav button').forEach(btn => {
+                btn.className = 'py-4 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium';
+                if (btn.id === 'nav-admin' && !currentUser.isAdmin) {
+                    btn.classList.add('hidden');
+                }
+            });
+
+            // Show selected tab
+            document.getElementById(`tab-${tab}`).classList.remove('hidden');
+            document.getElementById(`nav-${tab}`).className = 'py-4 px-1 border-b-2 border-blue-500 text-blue-600 font-medium';
+
+            if (tab === 'historial') {
+                loadHistorial();
+            } else if (tab === 'admin' && currentUser.isAdmin) {
+                loadAdminData();
+            }
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('drag-active');
+        }
+
+        function handleDragLeave(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-active');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-active');
+            const files = Array.from(e.dataTransfer.files);
+            processFiles(files);
+        }
+
+        function handleFileSelect(e) {
+            const files = Array.from(e.target.files);
+            processFiles(files);
+        }
+
+        function processFiles(files) {
+            const validFiles = files.filter(file => {
+                const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
+                const maxSize = 5 * 1024 * 1024; // 5MB
+                return validTypes.includes(file.type) && file.size <= maxSize;
+            });
+
+            if (validFiles.length === 0) {
+                alert('Por favor selecciona archivos válidos (JPG, PNG, PDF - máx 5MB)');
+                return;
+            }
+
+            uploadedFiles = validFiles;
+            displayFilePreview();
+            document.getElementById('start-analysis').disabled = uploadedFiles.length === 0;
+        }
+
+        function displayFilePreview() {
+            const preview = document.getElementById('files-preview');
+            const filesList = document.getElementById('files-list');
+
+            preview.classList.remove('hidden');
+            filesList.innerHTML = '';
+
+            uploadedFiles.forEach((file, index) => {
+                const fileDiv = document.createElement('div');
+                fileDiv.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-lg';
+                fileDiv.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <span class="text-2xl">${file.type.includes('pdf') ? '📄' : '🖼️'}</span>
+                        <div>
+                            <p class="font-medium text-gray-700">${file.name}</p>
+                            <p class="text-sm text-gray-500">${(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                        </div>
+                    </div>
+                    <button onclick="removeFile(${index})" class="text-red-500 hover:text-red-700">🗑️</button>
+                `;
+                filesList.appendChild(fileDiv);
+            });
+        }
+
+        function removeFile(index) {
+            uploadedFiles.splice(index, 1);
+            displayFilePreview();
+            document.getElementById('start-analysis').disabled = uploadedFiles.length === 0;
+        }
+
+        function startAnalysis() {
+            // Check daily limits for vendors
+            if (!currentUser.isAdmin) {
+                const today = new Date().toDateString();
+                const todayAnalysis = JSON.parse(localStorage.getItem('energySaverHistory') || '[]')
+                    .filter(a => a.vendedor === currentUser.name && new Date(a.timestamp).toDateString() === today);
+                
+                if (todayAnalysis.length >= dailyLimit) {
+                    alert('Has alcanzado el límite diario de análisis (50). Inténtalo mañana.');
+                    return;
+                }
+            }
+
+            // Validate client data
+            const clientData = {
+                nombre: document.getElementById('cliente-nombre').value.trim(),
+                telefono: document.getElementById('cliente-telefono').value.trim(),
+                email: document.getElementById('cliente-email').value.trim(),
+                tipo: document.getElementById('cliente-tipo').value
+            };
+
+            if (!clientData.nombre || !clientData.telefono) {
+                alert('Por favor completa al menos el nombre y teléfono del cliente');
+                return;
+            }
+
+            if (uploadedFiles.length < 2) {
+                alert('Por favor sube al menos 2 recibos para el análisis');
+                return;
+            }
+
+            // Start analysis
+            showLoadingModal();
+            simulateAnalysis(clientData);
+        }
+
+        function showLoadingModal() {
+            document.getElementById('loading-modal').classList.remove('hidden');
+            
+            let progress = 0;
+            const progressBar = document.getElementById('progress-bar');
+            
+            const interval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                }
+                progressBar.style.width = progress + '%';
+            }, 200);
+        }
+
+        function hideLoadingModal() {
+            document.getElementById('loading-modal').classList.add('hidden');
+        }
+
+        function simulateAnalysis(clientData) {
+            setTimeout(() => {
+                // Simulate OCR and analysis
+                const analysisData = generateAnalysisResults(clientData);
+                currentAnalysis = analysisData;
+                
+                // Update counter
+                updateAnalysisCounter();
+
+                // Save to history
+                saveAnalysisToHistory(analysisData);
+
+                // Show results
+                displayAnalysisResults(analysisData);
+                hideLoadingModal();
+                
+                // Show results tab
+                document.getElementById('tab-nuevo').classList.add('hidden');
+                document.getElementById('analysis-results').classList.remove('hidden');
+            }, 3000);
+        }
+
+        function generateAnalysisResults(clientData) {
+            // Simulate realistic energy consumption data
+            const consumoPromedio = Math.floor(Math.random() * 800) + 200; // 200-1000 kWh
+            const facturaPromedio = consumoPromedio * (Math.floor(Math.random() * 200) + 300); // ₡300-500 per kWh
+            const factorPotencia = (Math.random() * 0.3) + 0.7; // 0.7-1.0
+            const tieneMultas = factorPotencia < 0.9;
+            const multaMensual = tieneMultas ? Math.floor(Math.random() * 50000) + 10000 : 0;
+
+            // Select appropriate equipment
+            let equipoRecomendado = null;
+            for (const [key, equipo] of Object.entries(equipos)) {
+                if (facturaPromedio >= equipo.minFactura && facturaPromedio <= equipo.maxFactura) {
+                    equipoRecomendado = { ...equipo, key };
+                    break;
+                }
+            }
+
+            if (!equipoRecomendado) {
+                equipoRecomendado = { ...equipos['JS-2499'], key: 'JS-2499' };
+            }
+
+            // Calculate savings
+            const ahorroEnergetico = Math.floor(facturaPromedio * (0.20 + Math.random() * 0.05)); // 20-25%
+            const ahorroMultas = multaMensual;
+            const ahorroTotal = ahorroEnergetico + ahorroMultas;
+
+            // Calculate financing
+            const totalEquipo = (equipoRecomendado.precio + equipoRecomendado.instalacion) * 1.13; // +13% IVA
+            const cuotaMensual = equipoRecomendado.cuotaUSD * TC_BCCR;
+            const flujoPositivo = ahorroTotal - cuotaMensual;
+            const roiMeses = Math.ceil(totalEquipo / ahorroTotal);
+
+            return {
+                id: Date.now(),
+                cliente: clientData,
+                fecha: new Date().toLocaleDateString('es-CR'),
+                timestamp: new Date().toISOString(),
+                archivos: uploadedFiles.length,
+                consumoPromedio,
+                facturaPromedio,
+                factorPotencia: factorPotencia.toFixed(2),
+                tieneMultas,
+                multaMensual,
+                equipoRecomendado,
+                ahorroEnergetico,
+                ahorroMultas,
+                ahorroTotal,
+                totalEquipo: Math.floor(totalEquipo),
+                cuotaMensual: Math.floor(cuotaMensual),
+                flujoPositivo: Math.floor(flujoPositivo),
+                roiMeses,
+                vendedor: currentUser.name,
+                vendedorEmail: currentUser.email
+            };
+        }
+
+        function displayAnalysisResults(data) {
+            // Client Summary
+            document.getElementById('client-summary').innerHTML = `
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-gray-900">${data.cliente.nombre}</div>
+                    <div class="text-sm text-gray-600">${data.cliente.telefono}</div>
+                    <div class="text-sm text-gray-600">${data.cliente.email || 'Sin email'}</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-lg font-semibold text-blue-600">${data.cliente.tipo.charAt(0).toUpperCase() + data.cliente.tipo.slice(1)}</div>
+                    <div class="text-sm text-gray-600">Fecha: ${data.fecha}</div>
+                    <div class="text-sm text-gray-600">Archivos: ${data.archivos}</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-lg font-semibold text-green-600">Vendedor</div>
+                    <div class="text-sm text-gray-600">${data.vendedor}</div>
+                </div>
+            `;
+
+            // Current Situation
+            document.getElementById('current-situation').innerHTML = `
+                <div class="text-center p-4 bg-blue-50 rounded-lg">
+                    <div class="text-2xl font-bold text-blue-600">${data.consumoPromedio}</div>
+                    <div class="text-sm text-gray-600">kWh promedio/mes</div>
+                </div>
+                <div class="text-center p-4 bg-red-50 rounded-lg">
+                    <div class="text-2xl font-bold text-red-600">₡${data.facturaPromedio.toLocaleString()}</div>
+                    <div class="text-sm text-gray-600">Factura promedio/mes</div>
+                </div>
+                <div class="text-center p-4 ${data.factorPotencia >= 0.9 ? 'bg-green-50' : 'bg-yellow-50'} rounded-lg">
+                    <div class="text-2xl font-bold ${data.factorPotencia >= 0.9 ? 'text-green-600' : 'text-yellow-600'}">${data.factorPotencia}</div>
+                    <div class="text-sm text-gray-600">Factor de Potencia</div>
+                </div>
+                <div class="text-center p-4 ${data.tieneMultas ? 'bg-red-50' : 'bg-green-50'} rounded-lg">
+                    <div class="text-2xl font-bold ${data.tieneMultas ? 'text-red-600' : 'text-green-600'}">₡${data.multaMensual.toLocaleString()}</div>
+                    <div class="text-sm text-gray-600">Multas/mes</div>
+                </div>
+            `;
+
+            // Recommended Equipment
+            document.getElementById('recommended-equipment').innerHTML = `
+                <div class="equipo-card bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-xl border-2 border-blue-200">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-2xl font-bold text-gray-900">${data.equipoRecomendado.name}</h3>
+                            <p class="text-gray-600">${data.equipoRecomendado.description}</p>
+                        </div>
+                        <div class="text-4xl">⚡</div>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                        <div>
+                            <div class="text-lg font-semibold text-blue-600">${data.equipoRecomendado.precio.toLocaleString()}</div>
+                            <div class="text-sm text-gray-600">Precio Equipo</div>
+                        </div>
+                        <div>
+                            <div class="text-lg font-semibold text-blue-600">${data.equipoRecomendado.instalacion}</div>
+                            <div class="text-sm text-gray-600">Instalación</div>
+                        </div>
+                        <div>
+                            <div class="text-lg font-semibold text-green-600">₡${data.totalEquipo.toLocaleString()}</div>
+                            <div class="text-sm text-gray-600">Total + IVA</div>
+                        </div>
+                        <div>
+                            <div class="text-lg font-semibold text-purple-600">Ideal para</div>
+                            <div class="text-sm text-gray-600">₡${data.equipoRecomendado.minFactura.toLocaleString()}-₡${data.equipoRecomendado.maxFactura.toLocaleString()}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Financial Plan
+            document.getElementById('financial-plan').innerHTML = `
+                <div class="text-center p-6 bg-green-50 rounded-xl">
+                    <div class="text-3xl font-bold text-green-600">₡${(data.equipoRecomendado.prima * TC_BCCR).toLocaleString()}</div>
+                    <div class="text-sm text-gray-600 mt-1">Prima Inicial (20%)</div>
+                    <div class="text-xs text-gray-500">${data.equipoRecomendado.prima} USD</div>
+                </div>
+                <div class="text-center p-6 bg-blue-50 rounded-xl">
+                    <div class="text-3xl font-bold text-blue-600">₡${data.cuotaMensual.toLocaleString()}</div>
+                    <div class="text-sm text-gray-600 mt-1">Cuota Mensual x 24</div>
+                    <div class="text-xs text-gray-500">${data.equipoRecomendado.cuotaUSD} USD</div>
+                </div>
+                <div class="text-center p-6 bg-purple-50 rounded-xl">
+                    <div class="text-3xl font-bold text-purple-600">0%</div>
+                    <div class="text-sm text-gray-600 mt-1">Intereses</div>
+                    <div class="text-xs text-gray-500">Financiamiento propio</div>
+                </div>
+            `;
+
+            // Initialize savings with prima toggle
+            updateSavingsCalculation();
+        }
+
+        function updateSavingsCalculation() {
+            if (!currentAnalysis) return;
+
+            const includePrima = document.getElementById('prima-toggle').checked;
+            const statusElement = document.getElementById('prima-status');
+            
+            // Update toggle status
+            statusElement.textContent = includePrima ? 'ON' : 'OFF';
+            statusElement.className = `text-sm font-medium ${includePrima ? 'text-blue-600' : 'text-red-600'}`;
+
+            // Calculate based on prima inclusion
+            let pagoMensualTotal, flujoPositivo, scenario;
+            
+            if (includePrima) {
+                // ON: Cuota mensual + cuota de prima (prima/24)
+                const cuotaPrima = Math.floor((currentAnalysis.equipoRecomendado.prima * TC_BCCR) / 24);
+                pagoMensualTotal = currentAnalysis.cuotaMensual + cuotaPrima;
+                flujoPositivo = currentAnalysis.ahorroTotal - pagoMensualTotal;
+                scenario = `Cuota + Pro-rata Prima (₡${cuotaPrima.toLocaleString()}/mes)`;
+            } else {
+                // OFF: Solo cuota mensual
+                pagoMensualTotal = currentAnalysis.cuotaMensual;
+                flujoPositivo = currentAnalysis.ahorroTotal - pagoMensualTotal;
+                scenario = 'Solo Cuotas Mensuales';
+            }
+
+            // Savings Projection
+            document.getElementById('savings-projection').innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="text-center p-6 bg-green-50 rounded-xl">
+                        <div class="text-2xl font-bold text-green-600">₡${currentAnalysis.ahorroTotal.toLocaleString()}</div>
+                        <div class="text-sm text-gray-600">Ahorro Mensual Total</div>
+                        <div class="text-xs text-gray-500 mt-1">
+                            Energía: ₡${currentAnalysis.ahorroEnergetico.toLocaleString()}<br>
+                            Multas: ₡${currentAnalysis.ahorroMultas.toLocaleString()}
+                        </div>
+                    </div>
+                    <div class="text-center p-6 bg-blue-50 rounded-xl">
+                        <div class="text-2xl font-bold text-blue-600">₡${(currentAnalysis.ahorroTotal * 12).toLocaleString()}</div>
+                        <div class="text-sm text-gray-600">Ahorro Anual</div>
+                        <div class="text-xs text-gray-500 mt-1">20-25% de reducción</div>
+                    </div>
+                    <div class="text-center p-6 bg-purple-50 rounded-xl">
+                        <div class="text-2xl font-bold text-purple-600">${Math.ceil(currentAnalysis.totalEquipo / currentAnalysis.ahorroTotal)}</div>
+                        <div class="text-sm text-gray-600">Meses ROI Real</div>
+                        <div class="text-xs text-gray-500 mt-1">Retorno de inversión</div>
+                    </div>
+                </div>
+                <div class="mt-6 p-6 ${includePrima ? 'bg-gradient-to-r from-orange-50 to-red-50 border-orange-200' : 'bg-gradient-to-r from-green-50 to-blue-50 border-green-200'} rounded-xl border-2">
+                    <h3 class="text-lg font-bold text-gray-900 mb-2">💰 Flujo de Caja Mensual - ${scenario}</h3>
+                    <div class="grid grid-cols-3 gap-4 text-center">
+                        <div>
+                            <div class="text-xl font-bold text-green-600">+₡${currentAnalysis.ahorroTotal.toLocaleString()}</div>
+                            <div class="text-sm text-gray-600">Ahorros</div>
+                        </div>
+                        <div>
+                            <div class="text-xl font-bold text-red-600">-₡${pagoMensualTotal.toLocaleString()}</div>
+                            <div class="text-sm text-gray-600">${includePrima ? 'Cuota + Prima' : 'Solo Cuota'}</div>
+                        </div>
+                        <div>
+                            <div class="text-xl font-bold ${flujoPositivo > 0 ? 'text-green-600' : 'text-red-600'}">₡${flujoPositivo.toLocaleString()}</div>
+                            <div class="text-sm text-gray-600">Flujo Neto</div>
+                        </div>
+                    </div>
+                    ${includePrima ? `
+                    <div class="mt-3 p-3 bg-yellow-100 rounded-lg">
+                        <p class="text-sm text-yellow-800">
+                            <strong>Modo ON:</strong> Prima distribuida en 24 meses (₡${Math.floor((currentAnalysis.equipoRecomendado.prima * TC_BCCR) / 24).toLocaleString()}/mes) + Cuota normal
+                        </p>
+                    </div>
+                    ` : `
+                    <div class="mt-3 p-3 bg-green-100 rounded-lg">
+                        <p class="text-sm text-green-800">
+                            <strong>Modo OFF:</strong> Solo cuotas mensuales. Prima se paga aparte al inicio.
+                        </p>
+                    </div>
+                    `}
+                </div>
+                <div class="mt-4 p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+                    <h4 class="font-semibold text-yellow-800 mb-2">📊 Proyección 5 Años</h4>
+                    <div class="grid grid-cols-2 gap-4 text-sm">
+                        <div>Ahorro total: <span class="font-bold">₡${(currentAnalysis.ahorroTotal * 60).toLocaleString()}</span></div>
+                        <div>Inversión: <span class="font-bold">₡${currentAnalysis.totalEquipo.toLocaleString()}</span></div>
+                        <div class="col-span-2">Ganancia neta: <span class="font-bold text-green-600">₡${((currentAnalysis.ahorroTotal * 60) - currentAnalysis.totalEquipo).toLocaleString()}</span></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function saveAnalysisToHistory(data) {
+            let history = JSON.parse(localStorage.getItem('energySaverHistory') || '[]');
+            history.unshift(data);
+            
+            // Keep only last 500 analyses
+            if (history.length > 500) {
+                history = history.slice(0, 500);
+            }
+            
+            localStorage.setItem('energySaverHistory', JSON.stringify(history));
+        }
+
+        function loadHistorial() {
+            const history = JSON.parse(localStorage.getItem('energySaverHistory') || '[]');
+            
+            // Filter based on user role
+            if (currentUser.isAdmin) {
+                allAnalysis = history;
+            } else {
+                allAnalysis = history.filter(a => a.vendedorEmail === currentUser.email);
+            }
+            
+            filteredAnalysis = [...allAnalysis];
+            displayHistorial();
+        }
+
+        function displayHistorial() {
+            const historialList = document.getElementById('historial-list');
+            
+            if (filteredAnalysis.length === 0) {
+                historialList.innerHTML = '<p class="text-gray-500 text-center py-8">No hay análisis que coincidan con la búsqueda</p>';
+                return;
+            }
+
+            historialList.innerHTML = '';
+            filteredAnalysis.forEach(analysis => {
+                const analysisDiv = document.createElement('div');
+                analysisDiv.className = 'border border-gray-200 rounded-lg p-4 hover:bg-gray-50 cursor-pointer transition-colors';
+                analysisDiv.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                            <h3 class="font-semibold text-gray-900">${analysis.cliente.nombre}</h3>
+                            <p class="text-sm text-gray-600">${analysis.cliente.telefono} | ${analysis.fecha}</p>
+                            <p class="text-sm text-gray-500">Equipo: ${analysis.equipoRecomendado.name} | Ahorro: ₡${analysis.ahorroTotal.toLocaleString()}/mes</p>
+                            ${currentUser.isAdmin ? `<p class="text-xs text-blue-600 font-medium">Vendedor: ${analysis.vendedor}</p>` : ''}
+                        </div>
+                        <div class="text-right space-x-2">
+                            <button onclick="viewAnalysis(${analysis.id})" class="text-blue-600 hover:text-blue-800 text-sm font-medium">Ver Detalles</button>
+                            <button onclick="exportSingleAnalysis(${analysis.id})" class="text-green-600 hover:text-green-800 text-sm font-medium">Exportar</button>
+                        </div>
+                    </div>
+                `;
+                historialList.appendChild(analysisDiv);
+            });
+        }
+
+        function filterHistorial() {
+            const searchTerm = document.getElementById('search-historial').value.toLowerCase();
+            
+            filteredAnalysis = allAnalysis.filter(analysis => {
+                return analysis.cliente.nombre.toLowerCase().includes(searchTerm) ||
+                       analysis.cliente.telefono.includes(searchTerm) ||
+                       analysis.fecha.includes(searchTerm) ||
+                       (currentUser.isAdmin && analysis.vendedor.toLowerCase().includes(searchTerm));
+            });
+            
+            sortHistorial();
+        }
+
+        function sortHistorial() {
+            const sortBy = document.getElementById('sort-historial').value;
+            
+            switch(sortBy) {
+                case 'fecha-desc':
+                    filteredAnalysis.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                    break;
+                case 'fecha-asc':
+                    filteredAnalysis.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+                    break;
+                case 'cliente-asc':
+                    filteredAnalysis.sort((a, b) => a.cliente.nombre.localeCompare(b.cliente.nombre));
+                    break;
+                case 'cliente-desc':
+                    filteredAnalysis.sort((a, b) => b.cliente.nombre.localeCompare(a.cliente.nombre));
+                    break;
+                case 'vendedor-asc':
+                    filteredAnalysis.sort((a, b) => a.vendedor.localeCompare(b.vendedor));
+                    break;
+                case 'vendedor-desc':
+                    filteredAnalysis.sort((a, b) => b.vendedor.localeCompare(a.vendedor));
+                    break;
+            }
+            
+            displayHistorial();
+        }
+
+        function viewAnalysis(id) {
+            const analysis = allAnalysis.find(a => a.id === id);
+            if (analysis) {
+                currentAnalysis = analysis;
+                displayAnalysisResults(analysis);
+                document.getElementById('tab-historial').classList.add('hidden');
+                document.getElementById('analysis-results').classList.remove('hidden');
+            }
+        }
+
+        function showPaymentModal() {
+            if (!currentAnalysis) return;
+            
+            const modal = document.getElementById('payment-modal');
+            const content = document.getElementById('payment-content');
+            
+            content.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <h4 class="font-semibold text-gray-900">Resumen del Cliente</h4>
+                        <div class="bg-gray-50 p-4 rounded-lg">
+                            <p><strong>Cliente:</strong> ${currentAnalysis.cliente.nombre}</p>
+                            <p><strong>Teléfono:</strong> ${currentAnalysis.cliente.telefono}</p>
+                            <p><strong>Email:</strong> ${currentAnalysis.cliente.email || 'N/A'}</p>
+                            <p><strong>Equipo:</strong> ${currentAnalysis.equipoRecomendado.name}</p>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <h4 class="font-semibold text-gray-900">Detalles de Pago</h4>
+                        <div class="bg-green-50 p-4 rounded-lg">
+                            <p class="text-2xl font-bold text-green-600">₡${(currentAnalysis.equipoRecomendado.prima * TC_BCCR).toLocaleString()}</p>
+                            <p class="text-sm text-gray-600">Prima Inicial (20%)</p>
+                            <hr class="my-2">
+                            <p><strong>Cuotas:</strong> 24 x ₡${currentAnalysis.cuotaMensual.toLocaleString()}</p>
+                            <p><strong>Total Equipo:</strong> ₡${currentAnalysis.totalEquipo.toLocaleString()}</p>
+                            <p><strong>Ahorro Mensual:</strong> ₡${currentAnalysis.ahorroTotal.toLocaleString()}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-6 p-4 bg-blue-50 rounded-lg">
+                    <h4 class="font-semibold text-blue-900 mb-3">💳 Métodos de Pago Disponibles</h4>
+                    <div class="grid grid-cols-1 gap-4">
+                        <label class="flex items-start space-x-3 cursor-pointer p-3 border rounded-lg hover:bg-blue-100">
+                            <input type="radio" name="payment-method" value="transfer" checked class="text-blue-600 mt-1">
+                            <div>
+                                <div class="font-medium">🏦 Transferencia Bancaria</div>
+                                <div class="text-sm text-gray-600">
+                                    <strong>${companyData.bancoUSD.banco}</strong><br>
+                                    USD: ${companyData.bancoUSD.cuenta} | IBAN: ${companyData.bancoUSD.iban}<br>
+                                    CRC: ${companyData.bancoCRC.cuenta} | IBAN: ${companyData.bancoCRC.iban}
+                                </div>
+                            </div>
+                        </label>
+                        <label class="flex items-start space-x-3 cursor-pointer p-3 border rounded-lg hover:bg-green-100">
+                            <input type="radio" name="payment-method" value="sinpe" class="text-blue-600 mt-1">
+                            <div>
+                                <div class="font-medium">📱 SINPE Móvil</div>
+                                <div class="text-sm text-gray-600">
+                                    Número: <strong>${companyData.contacto.whatsapp}</strong><br>
+                                    Beneficiario: ${companyData.representante}
+                                </div>
+                            </div>
+                        </label>
+                        <label class="flex items-start space-x-3 cursor-pointer p-3 border rounded-lg hover:bg-purple-100">
+                            <input type="radio" name="payment-method" value="efectivo" class="text-blue-600 mt-1">
+                            <div>
+                                <div class="font-medium">💵 Efectivo</div>
+                                <div class="text-sm text-gray-600">
+                                    Pago en oficina o domicilio<br>
+                                    Tel: ${companyData.contacto.telefono}
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                <div class="mt-4 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                    <p class="text-sm text-yellow-800">
+                        <strong>⚠️ Importante:</strong> Una vez confirmado el pago de la prima, se procederá a programar la instalación. 
+                        Las cuotas mensuales inician 30 días después de la instalación.
+                    </p>
+                </div>
+            `;
+            
+            modal.classList.remove('hidden');
+        }
+
+        function processPayment() {
+            const paymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
+            let paymentDetails = '';
+            
+            switch(paymentMethod) {
+                case 'transfer':
+                    paymentDetails = `Transferencia Bancaria
+Datos para el pago:
+${companyData.bancoUSD.banco}
+Cuenta USD: ${companyData.bancoUSD.cuenta}
+IBAN USD: ${companyData.bancoUSD.iban}
+Cuenta CRC: ${companyData.bancoCRC.cuenta}  
+IBAN CRC: ${companyData.bancoCRC.iban}
+Beneficiario: ${companyData.name}`;
+                    break;
+                case 'sinpe':
+                    paymentDetails = `SINPE Móvil
+Número: ${companyData.contacto.whatsapp}
+Beneficiario: ${companyData.representante}
+Monto: ₡${(currentAnalysis.equipoRecomendado.prima * TC_BCCR).toLocaleString()}`;
+                    break;
+                case 'efectivo':
+                    paymentDetails = `Pago en Efectivo
+Contactar al: ${companyData.contacto.telefono}
+WhatsApp: ${companyData.contacto.whatsapp}
+Se coordinará recogida o cita en oficina`;
+                    break;
+            }
+            
+            alert(`💳 PROCESAMIENTO DE PAGO
+            
+Prima a pagar: ₡${(currentAnalysis.equipoRecomendado.prima * TC_BCCR).toLocaleString()}
+Cliente: ${currentAnalysis.cliente.nombre}
+
+${paymentDetails}
+
+📞 Una vez realizado el pago, contactar:
+Tel: ${companyData.contacto.telefono}
+WhatsApp: ${companyData.contacto.whatsapp}
+Email: ${companyData.contacto.email}
+
+¡Gracias por confiar en Energy Saver Costa Rica!`);
+            
+            // Save payment record
+            const paymentRecord = {
+                ...currentAnalysis,
+                paymentDate: new Date().toISOString(),
+                paymentMethod: paymentMethod,
+                amountPaid: currentAnalysis.equipoRecomendado.prima * TC_BCCR,
+                status: 'pending_confirmation'
+            };
+            
+            let payments = JSON.parse(localStorage.getItem('energySaverPayments') || '[]');
+            payments.unshift(paymentRecord);
+            localStorage.setItem('energySaverPayments', JSON.stringify(payments));
+            
+            hidePaymentModal();
+        }
+
+        function generateProposal() {
+            if (!currentAnalysis) return;
+            
+            const proposalText = `
+PROPUESTA COMERCIAL - ENERGY SAVER COSTA RICA
+
+Cliente: ${currentAnalysis.cliente.nombre}
+Teléfono: ${currentAnalysis.cliente.telefono}
+Email: ${currentAnalysis.cliente.email || 'N/A'}
+Fecha: ${currentAnalysis.fecha}
+
+SITUACIÓN ACTUAL:
+- Consumo promedio: ${currentAnalysis.consumoPromedio} kWh/mes
+- Factura promedio: ₡${currentAnalysis.facturaPromedio.toLocaleString()}/mes
+- Factor de potencia: ${currentAnalysis.factorPotencia}
+- Multas mensuales: ₡${currentAnalysis.multaMensual.toLocaleString()}
+
+SOLUCIÓN PROPUESTA:
+Equipo: ${currentAnalysis.equipoRecomendado.name} - ${currentAnalysis.equipoRecomendado.description}
+Precio: $${currentAnalysis.equipoRecomendado.precio.toLocaleString()} + $${currentAnalysis.equipoRecomendado.instalacion} instalación
+Total con IVA: ₡${currentAnalysis.totalEquipo.toLocaleString()}
+
+PLAN DE FINANCIAMIENTO:
+- Prima inicial: ₡${(currentAnalysis.equipoRecomendado.prima * TC_BCCR).toLocaleString()}
+- 24 cuotas de: ₡${currentAnalysis.cuotaMensual.toLocaleString()}
+- Intereses: 0%
+
+PROYECCIÓN DE AHORROS:
+- Ahorro energético mensual: ₡${currentAnalysis.ahorroEnergetico.toLocaleString()}
+- Eliminación de multas: ₡${currentAnalysis.ahorroMultas.toLocaleString()}
+- Ahorro total mensual: ₡${currentAnalysis.ahorroTotal.toLocaleString()}
+- Flujo positivo mensual: ₡${currentAnalysis.flujoPositivo.toLocaleString()}
+- ROI: ${currentAnalysis.roiMeses} meses
+
+Vendedor: ${currentAnalysis.vendedor}
+Energy Saver Costa Rica - Tel: 8722-6666
+            `;
+            
+            const blob = new Blob([proposalText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Propuesta_${currentAnalysis.cliente.nombre.replace(/\s+/g, '_')}_${Date.now()}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            alert('Propuesta generada y descargada exitosamente');
+        }
+
+        function exportToExcel() {
+            if (!currentAnalysis) return;
+            
+            const data = [
+                ['ENERGY SAVER COSTA RICA - ANÁLISIS ENERGÉTICO'],
+                [''],
+                ['INFORMACIÓN DEL CLIENTE'],
+                ['Nombre', currentAnalysis.cliente.nombre],
+                ['Teléfono', currentAnalysis.cliente.telefono],
+                ['Email', currentAnalysis.cliente.email || 'N/A'],
+                ['Tipo', currentAnalysis.cliente.tipo],
+                ['Fecha', currentAnalysis.fecha],
+                ['Vendedor', currentAnalysis.vendedor],
+                [''],
+                ['SITUACIÓN ACTUAL'],
+                ['Consumo promedio (kWh/mes)', currentAnalysis.consumoPromedio],
+                ['Factura promedio (₡/mes)', currentAnalysis.facturaPromedio],
+                ['Factor de potencia', currentAnalysis.factorPotencia],
+                ['Multas mensuales (₡)', currentAnalysis.multaMensual],
+                [''],
+                ['EQUIPO RECOMENDADO'],
+                ['Modelo', currentAnalysis.equipoRecomendado.name],
+                ['Descripción', currentAnalysis.equipoRecomendado.description],
+                ['Precio USD', currentAnalysis.equipoRecomendado.precio],
+                ['Instalación USD', currentAnalysis.equipoRecomendado.instalacion],
+                ['Total con IVA (₡)', currentAnalysis.totalEquipo],
+                [''],
+                ['FINANCIAMIENTO'],
+                ['Prima inicial (₡)', currentAnalysis.equipoRecomendado.prima * TC_BCCR],
+                ['Cuota mensual (₡)', currentAnalysis.cuotaMensual],
+                ['Número de cuotas', 24],
+                ['Intereses', '0%'],
+                [''],
+                ['AHORROS PROYECTADOS'],
+                ['Ahorro energético mensual (₡)', currentAnalysis.ahorroEnergetico],
+                ['Ahorro en multas (₡)', currentAnalysis.ahorroMultas],
+                ['Ahorro total mensual (₡)', currentAnalysis.ahorroTotal],
+                ['Ahorro anual (₡)', currentAnalysis.ahorroTotal * 12],
+                ['Flujo positivo mensual (₡)', currentAnalysis.flujoPositivo],
+                ['ROI (meses)', currentAnalysis.roiMeses],
+                [''],
+                ['PROYECCIÓN 5 AÑOS'],
+                ['Ahorro total 5 años (₡)', currentAnalysis.ahorroTotal * 60],
+                ['Inversión total (₡)', currentAnalysis.totalEquipo],
+                ['Ganancia neta 5 años (₡)', (currentAnalysis.ahorroTotal * 60) - currentAnalysis.totalEquipo]
+            ];
+
+            const ws = //XLSX.utils.aoa_to_sheet(data);
+            const wb = //XLSX.utils.book_new();
+            //XLSX.utils.book_append_sheet(wb, ws, 'Análisis Energético');
+
+            //XLSX.writeFile(wb, `Analisis_${currentAnalysis.cliente.nombre.replace(/\s+/g, '_')}_${Date.now()}.xlsx`);
+        }
+
+        function exportToWord() {
+            if (!currentAnalysis) return;
+            
+            const wordContent = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Energy Saver Costa Rica - Análisis Energético</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .header { text-align: center; color: #2563eb; margin-bottom: 30px; }
+        .section { margin-bottom: 20px; }
+        .section h3 { color: #1f2937; border-bottom: 2px solid #e5e7eb; padding-bottom: 5px; }
+        .data-row { display: flex; justify-content: space-between; margin: 5px 0; }
+        .data-label { font-weight: bold; }
+        .highlight { background-color: #fef3c7; padding: 10px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔋 ENERGY SAVER COSTA RICA</h1>
+        <h2>ANÁLISIS ENERGÉTICO PROFESIONAL</h2>
+    </div>
+
+    <div class="section">
+        <h3>📋 INFORMACIÓN DEL CLIENTE</h3>
+        <div class="data-row"><span class="data-label">Nombre:</span> <span>${currentAnalysis.cliente.nombre}</span></div>
+        <div class="data-row"><span class="data-label">Teléfono:</span> <span>${currentAnalysis.cliente.telefono}</span></div>
+        <div class="data-row"><span class="data-label">Email:</span> <span>${currentAnalysis.cliente.email || 'N/A'}</span></div>
+        <div class="data-row"><span class="data-label">Tipo:</span> <span>${currentAnalysis.cliente.tipo}</span></div>
+        <div class="data-row"><span class="data-label">Fecha:</span> <span>${currentAnalysis.fecha}</span></div>
+        <div class="data-row"><span class="data-label">Vendedor:</span> <span>${currentAnalysis.vendedor}</span></div>
+    </div>
+
+    <div class="section">
+        <h3>⚡ SITUACIÓN ENERGÉTICA ACTUAL</h3>
+        <div class="data-row"><span class="data-label">Consumo promedio:</span> <span>${currentAnalysis.consumoPromedio} kWh/mes</span></div>
+        <div class="data-row"><span class="data-label">Factura promedio:</span> <span>₡${currentAnalysis.facturaPromedio.toLocaleString()}/mes</span></div>
+        <div class="data-row"><span class="data-label">Factor de potencia:</span> <span>${currentAnalysis.factorPotencia}</span></div>
+        <div class="data-row"><span class="data-label">Multas mensuales:</span> <span>₡${currentAnalysis.multaMensual.toLocaleString()}</span></div>
+    </div>
+
+    <div class="section">
+        <h3>🔧 EQUIPO RECOMENDADO</h3>
+        <div class="highlight">
+            <div class="data-row"><span class="data-label">Modelo:</span> <span>${currentAnalysis.equipoRecomendado.name}</span></div>
+            <div class="data-row"><span class="data-label">Descripción:</span> <span>${currentAnalysis.equipoRecomendado.description}</span></div>
+            <div class="data-row"><span class="data-label">Precio:</span> <span>${currentAnalysis.equipoRecomendado.precio.toLocaleString()} USD</span></div>
+            <div class="data-row"><span class="data-label">Instalación:</span> <span>${currentAnalysis.equipoRecomendado.instalacion} USD</span></div>
+            <div class="data-row"><span class="data-label">Total con IVA:</span> <span>₡${currentAnalysis.totalEquipo.toLocaleString()}</span></div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h3>💰 PLAN DE FINANCIAMIENTO</h3>
+        <div class="data-row"><span class="data-label">Prima inicial:</span> <span>₡${(currentAnalysis.equipoRecomendado.prima * TC_BCCR).toLocaleString()}</span></div>
+        <div class="data-row"><span class="data-label">Cuotas mensuales:</span> <span>24 x ₡${currentAnalysis.cuotaMensual.toLocaleString()}</span></div>
+        <div class="data-row"><span class="data-label">Intereses:</span> <span>0% - Financiamiento propio</span></div>
+    </div>
+
+    <div class="section">
+        <h3>📈 PROYECCIÓN DE AHORROS</h3>
+        <div class="data-row"><span class="data-label">Ahorro energético mensual:</span> <span>₡${currentAnalysis.ahorroEnergetico.toLocaleString()}</span></div>
+        <div class="data-row"><span class="data-label">Ahorro en multas:</span> <span>₡${currentAnalysis.ahorroMultas.toLocaleString()}</span></div>
+        <div class="data-row"><span class="data-label">Ahorro total mensual:</span> <span>₡${currentAnalysis.ahorroTotal.toLocaleString()}</span></div>
+        <div class="data-row"><span class="data-label">Ahorro anual:</span> <span>₡${(currentAnalysis.ahorroTotal * 12).toLocaleString()}</span></div>
+        <div class="data-row"><span class="data-label">Flujo positivo mensual:</span> <span>₡${currentAnalysis.flujoPositivo.toLocaleString()}</span></div>
+        <div class="data-row"><span class="data-label">ROI:</span> <span>${currentAnalysis.roiMeses} meses</span></div>
+    </div>
+
+    <div class="section highlight">
+        <h3>🎯 RESUMEN EJECUTIVO - 5 AÑOS</h3>
+        <div class="data-row"><span class="data-label">Ahorro total:</span> <span>₡${(currentAnalysis.ahorroTotal * 60).toLocaleString()}</span></div>
+        <div class="data-row"><span class="data-label">Inversión:</span> <span>₡${currentAnalysis.totalEquipo.toLocaleString()}</span></div>
+        <div class="data-row"><span class="data-label">Ganancia neta:</span> <span>₡${((currentAnalysis.ahorroTotal * 60) - currentAnalysis.totalEquipo).toLocaleString()}</span></div>
+    </div>
+
+    <div style="text-align: center; margin-top: 40px; color: #6b7280;">
+        <p>Energy Saver Costa Rica</p>
+        <p>Tel: 8722-6666 | Email: energysavercr@gmail.com</p>
+        <p>Generado el ${new Date().toLocaleDateString('es-CR')}</p>
+    </div>
+</body>
+</html>
+            `;
+            
+            const blob = new Blob([wordContent], { type: 'application/msword' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Analisis_${currentAnalysis.cliente.nombre.replace(/\s+/g, '_')}_${Date.now()}.doc`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function generatePagare() {
+            if (!currentAnalysis) return;
+            
+            const fechaHoy = new Date().toLocaleDateString('es-CR');
+            const montoTotal = currentAnalysis.totalEquipo;
+            const cuotaMensual = currentAnalysis.cuotaMensual;
+            
+            const pagareContent = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>PAGARÉ - Energy Saver Costa Rica</title>
+    <style>
+        body { font-family: 'Times New Roman', serif; margin: 40px; line-height: 1.6; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .company-name { font-size: 18px; font-weight: bold; color: #2563eb; }
+        .document-title { font-size: 24px; font-weight: bold; margin: 20px 0; }
+        .amount { font-size: 20px; font-weight: bold; background: #fef3c7; padding: 10px; text-align: center; margin: 20px 0; }
+        .content { text-align: justify; margin-bottom: 20px; }
+        .signatures { margin-top: 60px; display: flex; justify-content: space-between; }
+        .signature-block { text-align: center; width: 45%; }
+        .line { border-bottom: 1px solid #000; margin-bottom: 5px; height: 50px; }
+        .bank-info { background: #f0f9ff; padding: 15px; border-radius: 5px; margin: 20px 0; }
+        .penalties { background: #fef2f2; padding: 15px; border-radius: 5px; margin: 10px 0; }
+        .footer { margin-top: 40px; font-size: 12px; color: #666; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="company-name">${companyData.name}</div>
+        <div>Cédula Jurídica: ${companyData.cedula}</div>
+        <div>Representante: ${companyData.representante}</div>
+        <div class="document-title">PAGARÉ</div>
+    </div>
+
+    <div class="amount">
+        MONTO: ${(montoTotal / TC_BCCR).toLocaleString()} USD
+        (₡${montoTotal.toLocaleString()} colones)
+    </div>
+
+    <div class="content">
+        <p><strong>FECHA:</strong> ${fechaHoy}</p>
+        
+        <p><strong>DEUDOR:</strong><br>
+        Nombre: ${currentAnalysis.cliente.nombre}<br>
+        Teléfono: ${currentAnalysis.cliente.telefono}<br>
+        Email: ${currentAnalysis.cliente.email || 'N/A'}</p>
+
+        <p><strong>POR MEDIO DEL PRESENTE PAGARÉ</strong>, el suscrito <strong>${currentAnalysis.cliente.nombre}</strong>, 
+        se obliga a pagar incondicionalmente a <strong>${companyData.name}</strong>, o a su orden, 
+        la suma de <strong>${(montoTotal / TC_BCCR).toLocaleString()} DÓLARES AMERICANOS</strong> 
+        (₡${montoTotal.toLocaleString()} colones costarricenses al tipo de cambio del BCCR).</p>
+
+        <p><strong>TÉRMINOS DE PAGO:</strong><br>
+        • <strong>24 cuotas mensuales</strong> de ${currentAnalysis.equipoRecomendado.cuotaUSD} USD c/u<br>
+        • <strong>Prima inicial:</strong> ${currentAnalysis.equipoRecomendado.prima} USD<br>
+        • <strong>Intereses:</strong> 0% (Financiamiento propio)<br>
+        • <strong>Fecha primer pago:</strong> ${new Date(Date.now() + 30*24*60*60*1000).toLocaleDateString('es-CR')}</p>
+
+        <p><strong>CONCEPTO:</strong> Compra e instalación de equipo de ahorro energético modelo ${currentAnalysis.equipoRecomendado.name} 
+        - ${currentAnalysis.equipoRecomendado.description}, incluyendo instalación completa e IVA.</p>
+    </div>
+
+    <div class="penalties">
+        <h3>PENALIDADES POR ATRASO</h3>
+        <ul>
+            <li><strong>Días 1-4:</strong> $50 USD fijos</li>
+            <li><strong>Día 5 en adelante:</strong> $5 USD diarios adicionales</li>
+            <li><strong>A partir del segundo mes:</strong> $15 USD diarios</li>
+        </ul>
+    </div>
+
+    <div class="bank-info">
+        <h3>INFORMACIÓN BANCARIA PARA PAGOS</h3>
+        <p><strong>${companyData.bancoUSD.banco}</strong></p>
+        <p><strong>Cuenta USD:</strong> ${companyData.bancoUSD.cuenta}<br>
+        <strong>IBAN USD:</strong> ${companyData.bancoUSD.iban}</p>
+        <p><strong>Cuenta CRC:</strong> ${companyData.bancoCRC.cuenta}<br>
+        <strong>IBAN CRC:</strong> ${companyData.bancoCRC.iban}</p>
+        <p><strong>SINPE Móvil:</strong> ${companyData.contacto.whatsapp}</p>
+    </div>
+
+    <div class="content">
+        <p>El presente pagaré se rige por las disposiciones del Código de Comercio de Costa Rica y 
+        será exigible desde la fecha de vencimiento de cada cuota. En caso de incumplimiento, 
+        el deudor renuncia expresamente al fuero de su domicilio y se somete a los tribunales de San José.</p>
+
+        <p><strong>GARANTÍA:</strong> El equipo instalado permanecerá como garantía hasta la cancelación total del presente pagaré. 
+        El equipo incluye garantía de 10 años por defectos de fabricación.</p>
+    </div>
+
+    <div class="signatures">
+        <div class="signature-block">
+            <div class="line"></div>
+            <p><strong>DEUDOR</strong><br>
+            ${currentAnalysis.cliente.nombre}<br>
+            Cédula: ________________<br>
+            Fecha: ${fechaHoy}</p>
+        </div>
+        <div class="signature-block">
+            <div class="line"></div>
+            <p><strong>ACREEDOR</strong><br>
+            ${companyData.representante}<br>
+            ${companyData.name}<br>
+            Fecha: ${fechaHoy}</p>
+        </div>
+    </div>
+
+    <div class="signatures" style="margin-top: 80px;">
+        <div class="signature-block">
+            <div class="line"></div>
+            <p><strong>TESTIGO 1</strong><br>
+            Nombre: ________________<br>
+            Cédula: ________________<br>
+            Fecha: ${fechaHoy}</p>
+        </div>
+        <div class="signature-block">
+            <div class="line"></div>
+            <p><strong>TESTIGO 2</strong><br>
+            Nombre: ________________<br>
+            Cédula: ________________<br>
+            Fecha: ${fechaHoy}</p>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 60px;">
+        <div class="line" style="width: 300px; margin: 0 auto;"></div>
+        <p><strong>NOTARIO PÚBLICO</strong><br>
+        ${companyData.notario}<br>
+        Carné: ${companyData.notarioCarne}<br>
+        Fecha: ${fechaHoy}</p>
+    </div>
+
+    <div class="footer">
+        <p><strong>Energy Saver Costa Rica</strong><br>
+        Tel: ${companyData.contacto.telefono} | Email: ${companyData.contacto.email}<br>
+        WhatsApp: ${companyData.contacto.whatsapp}<br>
+        Generado automáticamente el ${fechaHoy}</p>
+    </div>
+</body>
+</html>
+            `;
+            
+            const blob = new Blob([pagareContent], { type: 'application/msword' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `PAGARE_${currentAnalysis.cliente.nombre.replace(/\s+/g, '_')}_${Date.now()}.doc`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            alert('PAGARÉ generado exitosamente!\n\n' +
+                  'Documento legal completo con:\n' +
+                  '✅ Datos del cliente\n' +
+                  '✅ Términos financieros\n' +
+                  '✅ Penalidades por atraso\n' +
+                  '✅ Información bancaria\n' +
+                  '✅ Espacios para firmas y notario');
+        }
+
+        function shareWhatsApp() {
+            if (!currentAnalysis) return;
+            
+            const message = `🔋 *ENERGY SAVER COSTA RICA*
+📊 *ANÁLISIS ENERGÉTICO PROFESIONAL*
+
+👤 *Cliente:* ${currentAnalysis.cliente.nombre}
+📱 *Teléfono:* ${currentAnalysis.cliente.telefono}
+📅 *Fecha:* ${currentAnalysis.fecha}
+
+⚡ *SITUACIÓN ACTUAL:*
+• Consumo: ${currentAnalysis.consumoPromedio} kWh/mes
+• Factura: ₡${currentAnalysis.facturaPromedio.toLocaleString()}/mes
+• Factor de potencia: ${currentAnalysis.factorPotencia}
+• Multas: ₡${currentAnalysis.multaMensual.toLocaleString()}/mes
+
+🔧 *EQUIPO RECOMENDADO:*
+• Modelo: ${currentAnalysis.equipoRecomendado.name}
+• ${currentAnalysis.equipoRecomendado.description}
+• Precio: ${currentAnalysis.equipoRecomendado.precio.toLocaleString()} + instalación
+• Total: ₡${currentAnalysis.totalEquipo.toLocaleString()}
+
+💰 *FINANCIAMIENTO:*
+• Prima: ₡${(currentAnalysis.equipoRecomendado.prima * TC_BCCR).toLocaleString()}
+• 24 cuotas: ₡${currentAnalysis.cuotaMensual.toLocaleString()} c/u
+• Intereses: 0%
+
+📈 *AHORROS PROYECTADOS:*
+• Ahorro mensual: ₡${currentAnalysis.ahorroTotal.toLocaleString()}
+• Ahorro anual: ₡${(currentAnalysis.ahorroTotal * 12).toLocaleString()}
+• ROI: ${Math.ceil(currentAnalysis.totalEquipo / currentAnalysis.ahorroTotal)} meses
+
+💡 *BENEFICIOS:*
+✅ 20-25% menos en factura eléctrica
+✅ Eliminación total de multas
+✅ Garantía 10 años
+✅ Instalación incluida
+✅ 0% intereses
+
+📞 *CONTACTO:*
+Tel: 8722-6666
+Email: energysavercr@gmail.com
+WhatsApp: 8722-6666
+
+*¡Tu ahorro energético te está esperando!*`;
+
+            const whatsappUrl = `https://wa.me/50687226666?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+        }
+            if (filteredAnalysis.length === 0) {
+                alert('No hay análisis para exportar');
+                return;
+            }
+
+            const data = [
+                ['ENERGY SAVER COSTA RICA - HISTORIAL DE ANÁLISIS'],
+                [''],
+                ['Cliente', 'Teléfono', 'Email', 'Fecha', 'Vendedor', 'Equipo', 'Ahorro Mensual', 'ROI (meses)', 'Total Equipo']
+            ];
+
+            filteredAnalysis.forEach(analysis => {
+                data.push([
+                    analysis.cliente.nombre,
+                    analysis.cliente.telefono,
+                    analysis.cliente.email || 'N/A',
+                    analysis.fecha,
+                    analysis.vendedor,
+                    analysis.equipoRecomendado.name,
+                    analysis.ahorroTotal,
+                    analysis.roiMeses,
+                    analysis.totalEquipo
+                ]);
+            });
+
+            const ws = //XLSX.utils.aoa_to_sheet(data);
+            const wb = //XLSX.utils.book_new();
+            //XLSX.utils.book_append_sheet(wb, ws, 'Historial');
+
+            const filename = currentUser.isAdmin ? 
+                `Historial_Completo_${Date.now()}.xlsx` : 
+                `Historial_${currentUser.name.replace(/\s+/g, '_')}_${Date.now()}.xlsx`;
+
+            //XLSX.writeFile(wb, filename);
+        }
+
+        function exportSingleAnalysis(id) {
+            const analysis = allAnalysis.find(a => a.id === id);
+            if (!analysis) return;
+
+            const data = [
+                ['ENERGY SAVER COSTA RICA - ANÁLISIS INDIVIDUAL'],
+                [''],
+                ['CLIENTE', analysis.cliente.nombre],
+                ['Teléfono', analysis.cliente.telefono],
+                ['Email', analysis.cliente.email || 'N/A'],
+                ['Tipo', analysis.cliente.tipo],
+                ['Fecha', analysis.fecha],
+                ['Vendedor', analysis.vendedor],
+                [''],
+                ['EQUIPO', analysis.equipoRecomendado.name],
+                ['Precio USD', analysis.equipoRecomendado.precio],
+                ['Total ₡', analysis.totalEquipo],
+                [''],
+                ['AHORROS'],
+                ['Mensual ₡', analysis.ahorroTotal],
+                ['Anual ₡', analysis.ahorroTotal * 12],
+                ['ROI meses', analysis.roiMeses]
+            ];
+
+            const ws = //XLSX.utils.aoa_to_sheet(data);
+            const wb = //XLSX.utils.book_new();
+            //XLSX.utils.book_append_sheet(wb, ws, 'Análisis');
+
+            //XLSX.writeFile(wb, `Analisis_${analysis.cliente.nombre.replace(/\s+/g, '_')}_${Date.now()}.xlsx`);
+        }
+
+        function createVendor() {
+            if (!currentUser.isAdmin) {
+                alert('Solo el administrador puede crear vendedores');
+                return;
+            }
+            
+            const email = document.getElementById('new-vendor-email').value.trim();
+            const name = document.getElementById('new-vendor-name').value.trim();
+            
+            if (!email || !name) {
+                alert('Por favor completa email y nombre del vendedor');
+                return;
+            }
+
+            if (!email.includes('@')) {
+                alert('Por favor ingresa un email válido');
+                return;
+            }
+            
+            let vendors = JSON.parse(localStorage.getItem('energySaverVendors') || '[]');
+            
+            // Check if vendor already exists
+            if (vendors.find(v => v.email === email)) {
+                alert('Ya existe un vendedor con este email');
+                return;
+            }
+            
+            vendors.push({
+                email,
+                name,
+                active: true,
+                approved: true,
+                createdBy: currentUser.email,
+                createdAt: new Date().toISOString()
+            });
+            
+            localStorage.setItem('energySaverVendors', JSON.stringify(vendors));
+            
+            document.getElementById('new-vendor-email').value = '';
+            document.getElementById('new-vendor-name').value = '';
+            
+            alert(`Vendedor ${name} creado exitosamente.\nCredenciales de acceso:\nEmail: ${email}\nPassword: (definir por el vendedor)`);
+            loadVendorsList();
+        }
+
+        function loadVendorsList() {
+            const vendorsList = document.getElementById('vendors-list');
+            const vendors = JSON.parse(localStorage.getItem('energySaverVendors') || '[]');
+            
+            if (vendors.length === 0) {
+                vendorsList.innerHTML = '<p class="text-gray-500">No hay vendedores registrados</p>';
+                return;
+            }
+            
+            vendorsList.innerHTML = '';
+            vendors.forEach((vendor, index) => {
+                const vendorDiv = document.createElement('div');
+                vendorDiv.className = 'flex justify-between items-center p-3 border border-gray-200 rounded-lg';
+                vendorDiv.innerHTML = `
+                    <div>
+                        <div class="font-medium">${vendor.name}</div>
+                        <div class="text-sm text-gray-600">${vendor.email}</div>
+                        <div class="text-xs text-gray-500">Creado: ${new Date(vendor.createdAt).toLocaleDateString('es-CR')}</div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="px-2 py-1 text-xs rounded-full ${vendor.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                            ${vendor.active ? 'Activo' : 'Inactivo'}
+                        </span>
+                        <span class="px-2 py-1 text-xs rounded-full ${vendor.approved ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'}">
+                            ${vendor.approved ? 'Aprobado' : 'Pendiente'}
+                        </span>
+                        <button onclick="toggleVendorStatus(${index})" class="text-sm px-2 py-1 rounded ${vendor.active ? 'bg-red-100 text-red-700 hover:bg-red-200' : 'bg-green-100 text-green-700 hover:bg-green-200'}">
+                            ${vendor.active ? 'Desactivar' : 'Activar'}
+                        </button>
+                    </div>
+                `;
+                vendorsList.appendChild(vendorDiv);
+            });
+        }
+
+        function toggleVendorStatus(index) {
+            let vendors = JSON.parse(localStorage.getItem('energySaverVendors') || '[]');
+            vendors[index].active = !vendors[index].active;
+            localStorage.setItem('energySaverVendors', JSON.stringify(vendors));
+            loadVendorsList();
+        }
+
+        function loadAdminData() {
+            loadVendorsList();
+            updateSystemStats();
+        }
+
+        function updateSystemStats() {
+            const history = JSON.parse(localStorage.getItem('energySaverHistory') || '[]');
+            const vendors = JSON.parse(localStorage.getItem('energySaverVendors') || '[]');
+            const payments = JSON.parse(localStorage.getItem('energySaverPayments') || '[]');
+
+            document.getElementById('total-analysis').textContent = history.length;
+            document.getElementById('total-vendors').textContent = vendors.filter(v => v.active).length;
+            
+            const totalRevenue = payments.reduce((sum, payment) => sum + payment.amountPaid, 0);
+            document.getElementById('total-revenue').textContent = `₡${totalRevenue.toLocaleString()}`;
+            
+            const avgROI = history.length > 0 ? 
+                Math.round(history.reduce((sum, h) => sum + h.roiMeses, 0) / history.length) : 0;
+            document.getElementById('avg-roi').textContent = avgROI;
+        }
+
+        function logout() {
+            localStorage.removeItem('energySaverUser');
+            currentUser = null;
+            analysisCount = 0;
+            uploadedFiles = [];
+            currentAnalysis = null;
+            allAnalysis = [];
+            filteredAnalysis = [];
+            
+            document.getElementById('dashboard').classList.add('hidden');
+            document.getElementById('login-screen').classList.remove('hidden');
+            
+            // Reset forms
+            document.getElementById('login-email').value = '';
+            document.getElementById('login-password').value = '';
+            resetAnalysisForm();
+        }
+
+        function resetAnalysisForm() {
+            document.getElementById('cliente-nombre').value = '';
+            document.getElementById('cliente-telefono').value = '';
+            document.getElementById('cliente-email').value = '';
+            document.getElementById('cliente-tipo').value = 'residencial';
+            document.getElementById('files-preview').classList.add('hidden');
+            document.getElementById('files-list').innerHTML = '';
+            document.getElementById('start-analysis').disabled = true;
+            uploadedFiles = [];
+        }
+
+        // Global functions for onclick handlers
+        window.removeFile = removeFile;
+        window.viewAnalysis = viewAnalysis;
+        window.exportSingleAnalysis = exportSingleAnalysis;
+        window.toggleVendorStatus = toggleVendorStatus;
     </script>
 </body>
 </html>
