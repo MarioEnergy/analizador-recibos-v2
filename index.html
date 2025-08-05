@@ -348,7 +348,7 @@
                     dailyLimit: -1
                 };
                 localStorage.setItem("energySaverUser", JSON.stringify(currentUser));
-                alert("LOGIN OK! Dashboard loading..."); console.log("Login successful");
+                alert("LOGIN SUCCESSFUL - Welcome Mario!"); window.location.reload();
                 return;
             }
             alert("Credenciales incorrectas");
@@ -499,7 +499,7 @@
             const savedUser = localStorage.getItem('energySaverUser');
             if (savedUser) {
                 currentUser = JSON.parse(savedUser);
-                alert("LOGIN OK! Dashboard loading..."); console.log("Login successful");
+                alert("LOGIN SUCCESSFUL - Welcome Mario!"); window.location.reload();
             }
         }
 
@@ -522,7 +522,7 @@
                     dailyLimit: -1 // Unlimited for admin
                 };
                 localStorage.setItem('energySaverUser', JSON.stringify(currentUser));
-                alert("LOGIN OK! Dashboard loading..."); console.log("Login successful");
+                alert("LOGIN SUCCESSFUL - Welcome Mario!"); window.location.reload();
                 return;
             }
 
@@ -530,7 +530,7 @@
         }
                 };
                 localStorage.setItem('energySaverUser', JSON.stringify(currentUser));
-                alert("LOGIN OK! Dashboard loading..."); console.log("Login successful");
+                alert("LOGIN SUCCESSFUL - Welcome Mario!"); window.location.reload();
                 return;
             }
 
@@ -547,7 +547,7 @@
                     dailyLimit: 50
                 };
                 localStorage.setItem('energySaverUser', JSON.stringify(currentUser));
-                alert("LOGIN OK! Dashboard loading..."); console.log("Login successful");
+                alert("LOGIN SUCCESSFUL - Welcome Mario!"); window.location.reload();
                 return;
             }
 
