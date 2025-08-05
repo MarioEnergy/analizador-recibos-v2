@@ -331,6 +331,28 @@ l<!DOCTYPE html>
 
     <script>
         // Global Variables
+        // GLOBAL LOGIN FUNCTION
+        function handleLogin() {
+            const email = document.getElementById("login-email").value.trim();
+            const password = document.getElementById("login-password").value.trim();
+            if (!email || !password) {
+                alert("Por favor ingresa email y password");
+                return;
+            }
+            if (email === "mariosavardenergysaver@gmail.com" && password === "mario123") {
+                currentUser = {
+                    email: email,
+                    name: "Mario Savard Boies",
+                    role: "admin",
+                    isAdmin: true,
+                    dailyLimit: -1
+                };
+                localStorage.setItem("energySaverUser", JSON.stringify(currentUser));
+                showDashboard();
+                return;
+            }
+            alert("Credenciales incorrectas");
+        }
         let currentUser = null;
         let analysisCount = 0;
         let dailyLimit = 50;
