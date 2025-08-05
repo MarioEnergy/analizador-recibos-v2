@@ -84,19 +84,6 @@
         </header>
 
         <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Health Monitoring Dashboard -->
-        <div id="health-dashboard" class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl shadow-xl p-6 mb-8 text-white">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold">🎯 System Health Monitor</h3>
-                <div id="system-status" class="px-4 py-2 rounded-lg bg-white bg-opacity-20 font-bold">INITIALIZING...</div>
-            </div>
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4" id="module-status-grid">
-                <!-- Module status will be populated by JavaScript -->
-            </div>
-            <div class="mt-4 text-sm opacity-80">
-                <span id="uptime">Uptime: 0s</span> | <span id="last-update">Last update: --</span>
-            </div>
-        </div>
             <div class="bg-white rounded-2xl shadow-xl p-8">
                 <h2 class="text-2xl font-bold text-gray-900 mb-8">📊 Nuevo Análisis Energético</h2>
                 
@@ -172,71 +159,6 @@
         document.addEventListener("DOMContentLoaded", function() {
             console.log("🚀 Energy Saver V3.0 - Sistema Modulare Inicializado!");
             window.energySaverApp.init();
-            
-            // Setup health monitoring dashboard
-            setInterval(() => {
-                updateHealthDashboard();
-            }, 5000);
-            
-            // Initial dashboard update
-            setTimeout(() => {
-                updateHealthDashboard();
-            }, 2000);
-        
-        function updateHealthDashboard() {
-            if (!window.energySaverApp) return;
-            
-            const healthReport = window.energySaverApp.getSystemHealth();
-            if (!healthReport) return;
-            
-            // Update system status
-            const statusElement = document.getElementById("system-status");
-            if (statusElement) {
-                statusElement.textContent = healthReport.system.status;
-                statusElement.className = `px-4 py-2 rounded-lg font-bold ${
-                    healthReport.system.status === "HEALTHY" ? "bg-green-500" :
-                    healthReport.system.status === "WARNING" ? "bg-yellow-500" : "bg-red-500"
-                }`;
-            }
-            
-            // Update module grid
-            const moduleGrid = document.getElementById("module-status-grid");
-            if (moduleGrid && healthReport.modules) {
-                moduleGrid.innerHTML = "";
-                
-                for (const [moduleName, stats] of Object.entries(healthReport.modules)) {
-                    const moduleCard = document.createElement("div");
-                    const statusColor = stats.status === "HEALTHY" || stats.status === "READY" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800";
-                    const statusIcon = stats.status === "HEALTHY" || stats.status === "READY" ? "✅" : "⚠️";
-                    
-                    moduleCard.className = `${statusColor} rounded-lg p-3 text-center`;
-                    moduleCard.innerHTML = `
-                        <div class="text-lg">${statusIcon}</div>
-                        <div class="font-semibold text-xs">${moduleName.replace("Module", "").replace("Engine", "")}</div>
-                        <div class="text-xs">${stats.status}</div>
-                        <div class="text-xs">${stats.operations} ops</div>
-                    `;
-                    moduleGrid.appendChild(moduleCard);
-                }
-            }
-            
-            // Update uptime
-            const uptimeElement = document.getElementById("uptime");
-            if (uptimeElement && healthReport.system.uptime) {
-                const uptimeSeconds = Math.floor(healthReport.system.uptime / 1000);
-                uptimeElement.textContent = `Uptime: ${uptimeSeconds}s`;
-            }
-            
-            // Update last update time
-            const lastUpdateElement = document.getElementById("last-update");
-            if (lastUpdateElement) {
-                lastUpdateElement.textContent = `Last update: ${new Date().toLocaleTimeString()}`;
-            }
-                    healthReport.system.status === "HEALTHY" ? "bg-green-500" :
-                    healthReport.system.status === "WARNING" ? "bg-yellow-500" : "bg-red-500"
-                }`;
-            }
-        }
         });
     </script>
 </body>

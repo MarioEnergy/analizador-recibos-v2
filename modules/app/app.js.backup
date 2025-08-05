@@ -5,7 +5,6 @@ import FileManager from "./filemanager/filemanager.js";
 import OCRProcessor from "./ocr/ocr.js";
 import AnalysisEngine from "./analysis/analysis.js";
 import DocumentGenerator from "./documents/documents.js";
-import HealthMonitor from "../monitoring/health.js";
 
 class EnergySaverApp {
     constructor() {
@@ -13,9 +12,6 @@ class EnergySaverApp {
         this.fileManager = new FileManager();
         this.ocrProcessor = new OCRProcessor();
         this.analysisEngine = new AnalysisEngine();
-        this.healthMonitor = new HealthMonitor();
-        this.healthMonitor.initModule("EnergySaverApp");
-        this.initializeModuleMonitoring();
         this.documentGenerator = new DocumentGenerator();
         this.currentAnalysis = null;
     }
@@ -123,36 +119,3 @@ class EnergySaverApp {
 }
 
 export default EnergySaverApp;
-
-    // Initialize monitoring for all modules
-    initializeModuleMonitoring() {
-        // Set all modules as ready
-        setTimeout(() => {
-            this.healthMonitor.setModuleStatus("AuthModule", "READY");
-            this.healthMonitor.setModuleStatus("FileManager", "READY");
-            this.healthMonitor.setModuleStatus("OCRProcessor", "READY");
-            this.healthMonitor.setModuleStatus("AnalysisEngine", "READY");
-            this.healthMonitor.setModuleStatus("DocumentGenerator", "READY");
-            this.healthMonitor.setModuleStatus("EnergySaverApp", "HEALTHY");
-            
-            console.log("🎯 [SYSTEM] All modules initialized and monitored");
-            this.displaySystemHealth();
-        }, 1000);
-    }
-
-    // Display system health in console
-    displaySystemHealth() {
-        const healthReport = this.healthMonitor.generateHealthReport();
-        console.log("📊 [DASHBOARD] System Health:", healthReport.system);
-        
-        // Show module status
-        for (const [module, stats] of Object.entries(healthReport.modules)) {
-            const status = stats.status === 'HEALTHY' || stats.status === 'READY' ? '✅' : '⚠️';
-            console.log(`${status} ${module}: ${stats.status} (${stats.operations} ops, ${stats.errors} errors)`);
-        }
-    }
-
-    // Get system health for external access
-    getSystemHealth() {
-        return this.healthMonitor.generateHealthReport();
-    }

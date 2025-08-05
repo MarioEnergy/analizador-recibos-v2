@@ -1,17 +1,12 @@
 // FileManager - Gestione File e Upload
 import CONFIG from "../config/config.js";
-import HealthMonitor from "../monitoring/health.js";
 
 class FileManager {
     constructor() {
-        this.health = new HealthMonitor();
-        this.health.initModule("FileManager");
         this.uploadedFiles = [];
     }
 
         function simulateUpload() {
-            const startTime = Date.now();
-            this.health.setModuleStatus("FileManager", "UPLOADING");
             uploadedFiles = [
                 { name: 'recibo_enero.pdf', type: 'application/pdf', size: 1024 * 1024 },
                 { name: 'recibo_febrero.jpg', type: 'image/jpeg', size: 2 * 1024 * 1024 },
@@ -19,13 +14,10 @@ class FileManager {
             ];
             
             displayFiles();
-            this.health.trackOperation("FileManager", "upload", Date.now() - startTime);
-            this.health.setModuleStatus("FileManager", "FILES_READY");
             checkAnalysisReady();
         }
 
         function displayFiles() {
-            this.health.setModuleStatus("FileManager", "DISPLAYING");
             const statusEl = document.getElementById('files-status');
             statusEl.innerHTML = uploadedFiles.map(file => `
                 <div class="flex items-center justify-between bg-green-50 border border-green-200 p-3 rounded-lg mt-2">
