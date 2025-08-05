@@ -1,0 +1,54 @@
+// DocumentGenerator - Generazione Documenti Legali
+import CONFIG from "../config/config.js";
+
+class DocumentGenerator {
+    constructor() {
+        this.bankingInfo = CONFIG.banking;
+    }
+
+        function generatePagare() {
+            if (!currentAnalysis) return;
+            
+            const content = `PAGARÉ - ENERGY SAVER COSTA RICA
+
+Cliente: ${currentAnalysis.cliente.nombre}
+Teléfono: ${currentAnalysis.cliente.telefono}
+Fecha: ${new Date().toLocaleDateString('es-CR')}
+
+EQUIPO: ${currentAnalysis.equipoRecomendado.name}
+MONTO TOTAL: $${Math.floor(currentAnalysis.totalEquipo / CONFIG.financial.TC_BCCR)} USD
+(₡${currentAnalysis.totalEquipo.toLocaleString()} colones)
+
+FINANCIAMIENTO:
+Prima: $${currentAnalysis.equipoRecomendado.prima}
+24 Cuotas: $${currentAnalysis.equipoRecomendado.cuotaUSD} c/u
+Tasa interés: 0%
+
+EMPRESA:
+${CONFIG.company.name}
+Cédula: ${CONFIG.company.cedula}
+Representante: ${CONFIG.company.representante}
+Teléfono: ${CONFIG.company.telefono}
+
+INFORMACIÓN BANCARIA:
+${CONFIG.banking.banco}
+Cuenta USD: ${CONFIG.banking.cuentaUSD}
+IBAN USD: ${CONFIG.banking.ibanUSD}
+Cuenta CRC: ${CONFIG.banking.cuentaCRC}
+IBAN CRC: ${CONFIG.banking.ibanCRC}`;
+            
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `PAGARE_${currentAnalysis.cliente.nombre.replace(/\s+/g, '_')}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            alert('✅ PAGARÉ generado y descargado');
+        }
+
+
+}
+
+export default DocumentGenerator;
