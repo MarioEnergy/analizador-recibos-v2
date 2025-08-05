@@ -4,8 +4,8 @@
 // ============================================
 
 const GOOGLE_CONFIG = {
-    CLIENT_ID: '735489123456-abc123def456ghi789jkl012mno345pq.apps.googleusercontent.com', // Mario aggiorna
-    API_KEY: 'AIzaSyABC123DEF456GHI789JKL012MNO345PQR', // Mario aggiorna
+    CLIENT_ID: '636456552164-l6kras5i3kdj1htvf6lo262b4te2uos3.apps.googleusercontent.com',
+    API_KEY: '636456552164-l6kras5i3kdj1htvf6lo262b4te2uos3.apps.googleusercontent.com', // Usando CLIENT_ID come API_KEY
     DISCOVERY_DOC: 'https://www.googleapis.com/discovery/v1/apis/drive/v3/rest',
     SCOPES: 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/userinfo.email'
 };
