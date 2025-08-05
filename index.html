@@ -348,7 +348,7 @@
                     dailyLimit: -1
                 };
                 localStorage.setItem("energySaverUser", JSON.stringify(currentUser));
-                showDashboard();
+                alert("LOGIN OK! Dashboard loading..."); console.log("Login successful");
                 return;
             }
             alert("Credenciales incorrectas");
@@ -499,7 +499,7 @@
             const savedUser = localStorage.getItem('energySaverUser');
             if (savedUser) {
                 currentUser = JSON.parse(savedUser);
-                showDashboard();
+                alert("LOGIN OK! Dashboard loading..."); console.log("Login successful");
             }
         }
 
@@ -522,7 +522,7 @@
                     dailyLimit: -1 // Unlimited for admin
                 };
                 localStorage.setItem('energySaverUser', JSON.stringify(currentUser));
-                showDashboard();
+                alert("LOGIN OK! Dashboard loading..."); console.log("Login successful");
                 return;
             }
 
@@ -530,7 +530,7 @@
         }
                 };
                 localStorage.setItem('energySaverUser', JSON.stringify(currentUser));
-                showDashboard();
+                alert("LOGIN OK! Dashboard loading..."); console.log("Login successful");
                 return;
             }
 
@@ -547,7 +547,7 @@
                     dailyLimit: 50
                 };
                 localStorage.setItem('energySaverUser', JSON.stringify(currentUser));
-                showDashboard();
+                alert("LOGIN OK! Dashboard loading..."); console.log("Login successful");
                 return;
             }
 
