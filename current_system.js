@@ -159,6 +159,8 @@
         }
 
         async function performAnalysis() {
+            // TODO: Obtener de OCR real cuando esté completo
+            const ocrText = "Factor de Potencia: 0.88 Multa por bajo factor de potencia: ₡5,000";
             const clientData = {
                 nombre: document.getElementById('client-name').value.trim(),
                 telefono: document.getElementById('client-phone').value.trim(),
@@ -193,7 +195,8 @@
                     totalEquipo,
                     roiMeses,
                     porcentajeAhorro: Math.round((ahorroMensual / facturaPromedio) * 100),
-                    factorPotencia: (0.85 + Math.random() * 0.1).toFixed(2),
+                    factorPotencia: detectPowerFactor(ocrText) || "0.92",
+                    tienePenalidad: detectPowerFactorPenalty(ocrText),
                     eficienciaActual: Math.floor(70 + Math.random() * 20) + '%',
                     flujoPositivo: ahorroMensual - Math.floor(equipoRecomendado.cuotaUSD * CONFIG.financial.TC_BCCR),
                     timestamp: new Date().toISOString()
@@ -344,3 +347,35 @@ IBAN CRC: ${CONFIG.banking.ibanCRC}`;
         console.log('✅ Energy Saver Complete System loaded!');
     </script>
         window.performAnalysis = performAnalysis;
+
+        // Detección de Factor de Potencia Real
+        function detectPowerFactor(ocrText) {
+            if (!ocrText) return null;
+            
+            const patterns = [
+                /factor\s*de?\s*potencia[:.\s]*([0-9]\.[0-9]{2})/i,
+                /FP[:.\s]*([0-9]\.[0-9]{2})/i,
+                /cos\s*φ[:.\s]*([0-9]\.[0-9]{2})/i
+            ];
+            
+            for (const pattern of patterns) {
+                const match = ocrText.match(pattern);
+                if (match) return parseFloat(match[1]);
+            }
+            return null;
+        }
+        
+        // Detectar multas por bajo FP
+        function detectPowerFactorPenalty(ocrText) {
+            if (!ocrText) return false;
+            
+            const penaltyPatterns = [
+                /multa.*factor.*potencia/i,
+                /penalizaci[óo]n.*FP/i,
+                /cargo.*bajo.*factor/i
+            ];
+            
+            return penaltyPatterns.some(pattern => ocrText.match(pattern));
+        }
+        window.detectPowerFactor = detectPowerFactor;
+        window.detectPowerFactorPenalty = detectPowerFactorPenalty;
