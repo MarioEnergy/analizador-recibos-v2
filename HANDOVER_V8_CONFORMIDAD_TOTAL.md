@@ -149,3 +149,22 @@ Próximo: Implementar V5.0 o corregir handovers anteriores
 - Plan de implementación listo ✅
 
 **El próximo agente puede comenzar inmediatamente con V5.0**
+
+## 🤖 SISTEMA DE CUMPLIMIENTO PARA AGENTES AI (ACTUALIZACIÓN)
+
+### FORMATO OBLIGATORIO DE RESPUESTA:
+[APLICANDO REGLA #X: descripción]
+→ Acción específica
+→ Esperando confirmación/output### REGLAS REFORMULADAS PARA AI:
+
+**REGLA #1-AI**: SIEMPRE confirmar "Leí handover, aplicando reglas"
+**REGLA #3-AI**: UN comando → ESPERAR output → SIGUIENTE
+**REGLA #5-AI**: Pregunta texto = RESPONDER PRIMERO
+**REGLA #6-AI**: PROHIBIDO inventar archivos/soluciones
+
+### PALABRAS CLAVE DE CONTROL:
+- **ALTO**: Detener toda acción
+- **SOLO**: Limitar alcance
+- **PRIMERO/DESPUÉS**: Establecer orden
+- **NO**: Prohibición absoluta
+
