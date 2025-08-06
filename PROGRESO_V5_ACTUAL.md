@@ -7,7 +7,7 @@
 
 ## ⏳ PENDIENTE (7/10)
 4. ✅ ROI simplificado
-5. ⏳ Proyecciones 2-3 años
+5. ✅ Proyecciones 2-3 años
 6. ⏳ WhatsApp OTP
 7. ⏳ Gráficos consumo
 8. ⏳ Programa referidos

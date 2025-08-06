@@ -7,3 +7,4 @@ Wed Aug  6 04:08:07 AM UTC 2025
 Wed Aug  6 05:03:40 AM UTC 2025
 ✅ ROI simplificado: Muestra en años (más comprensible)
 Wed Aug  6 05:08:19 AM UTC 2025
+✅ Proyecciones 2-3 años: Visualización de ahorros futuros
