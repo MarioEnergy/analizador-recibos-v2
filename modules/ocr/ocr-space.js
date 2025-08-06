@@ -6,7 +6,7 @@ class OCRProcessor {
     constructor() {
         this.health = new HealthMonitor();
         this.health.initModule("OCRProcessor");
-        this.apiKey = 'K82938472988957';
+        this.apiKey = 'K82938472988957'; // API Key gratis
         this.apiUrl = 'https://api.ocr.space/parse/image';
     }
 
@@ -32,7 +32,6 @@ class OCRProcessor {
                 this.health.setModuleStatus("OCRProcessor", "READY");
                 return this.parseReceiptData(text);
             }
-            throw new Error('OCR failed');
         } catch (error) {
             console.error('Error OCR:', error);
             return this.getSimulatedData();
@@ -51,7 +50,7 @@ class OCRProcessor {
 
     extractNumber(text, regex) {
         const match = text.match(regex);
-        return match ? parseFloat(match[1].replace(/,/g, '')) : null;
+        return match ? parseFloat(match[1]) : null;
     }
 
     getSimulatedData() {

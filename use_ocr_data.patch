@@ -1,0 +1,2 @@
+                const consumoPromedio = ocrData.consumo || Math.floor(Math.random() * 1500) + 800;
+                const facturaPromedio = ocrData.monto || Math.floor(consumoPromedio * 0.45 * CONFIG.financial.TC_BCCR);

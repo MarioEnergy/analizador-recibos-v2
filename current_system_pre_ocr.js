@@ -177,93 +177,9 @@
             document.getElementById('analyze-btn').disabled = !(name && phone && hasFiles);
         }
 
-// OCR.space API inline
-const OCR_API_KEY = 'K82938472988957';
-const OCR_API_URL = 'https://api.ocr.space/parse/image';
-
-async function processImageWithOCR(imageFile) {
-    try {
-        const formData = new FormData();
-        formData.append('file', imageFile);
-        formData.append('apikey', OCR_API_KEY);
-        formData.append('language', 'spa');
-        formData.append('OCREngine', '2');
-
-        const response = await fetch(OCR_API_URL, {
-            method: 'POST',
-            body: formData
-        });
-
-        const result = await response.json();
-        
-        if (result.OCRExitCode === 1) {
-            const text = result.ParsedResults[0].ParsedText;
-            return parseReceiptData(text);
-        }
-    } catch (error) {
-        console.error('OCR Error:', error);
-    }
-    
-    return getSimulatedData();
-}
-
-function parseReceiptData(ocrText) {
-    return {
-        consumo: extractNumber(ocrText, /(\d+)\s*kwh/i) || 1200,
-        monto: extractNumber(ocrText, /total.*?(\d+)/i) || 85000,
-        factorPotencia: extractNumber(ocrText, /factor.*?(\d+\.\d+)/i) || 0.92,
-        tieneMulta: /multa|penalizaci/i.test(ocrText),
-        textoCompleto: ocrText
-    };
-}
-
-function extractNumber(text, regex) {
-    const match = text.match(regex);
-    return match ? parseFloat(match[1].replace(/,/g, '')) : null;
-}
-
-function getSimulatedData() {
-    return {
-        consumo: Math.floor(Math.random() * 1500) + 800,
-        monto: Math.floor(Math.random() * 100000) + 50000,
-        factorPotencia: 0.88 + Math.random() * 0.1,
-        tieneMulta: Math.random() > 0.7,
-        textoCompleto: 'Datos simulados'
-    };
-}
-        consumo: extractNumber(ocrText, /(\d+)\s*kwh/i) || 1200,
-        monto: extractNumber(ocrText, /total.*?(\d+)/i) || 85000,
-        factorPotencia: extractNumber(ocrText, /factor.*?(\d+\.\d+)/i) || 0.92,
-        tieneMulta: /multa|penalizaci/i.test(ocrText),
-        textoCompleto: ocrText
-    };
-}
-
-function extractNumber(text, regex) {
-    const match = text.match(regex);
-    return match ? parseFloat(match[1].replace(/,/g, '')) : null;
-}
-
-function getSimulatedData() {
-    return {
-        consumo: Math.floor(Math.random() * 1500) + 800,
-        monto: Math.floor(Math.random() * 100000) + 50000,
-        factorPotencia: 0.88 + Math.random() * 0.1,
-        tieneMulta: Math.random() > 0.7,
-        textoCompleto: 'Datos simulados'
-    };
-}
         async function performAnalysis() {
-            // Procesar con OCR real
-            let ocrData = await getSimulatedData(); // Por defecto datos simulados
-            let ocrText = "Factor de Potencia: 0.88 Multa por bajo factor de potencia: ₡5,000";
-            
-            if (uploadedFiles.length > 0) {
-                console.log('🔍 Procesando imagen con OCR...');
-                ocrData = await processImageWithOCR(uploadedFiles[0]);
-                ocrText = ocrData.textoCompleto || ocrText;
-                console.log('✅ Datos OCR:', ocrData);
-            }
+            // TODO: Obtener de OCR real cuando esté completo
+            const ocrText = "Factor de Potencia: 0.88 Multa por bajo factor de potencia: ₡5,000";
             const clientData = {
                 nombre: document.getElementById('client-name').value.trim(),
                 telefono: document.getElementById('client-phone').value.trim(),
@@ -281,8 +197,8 @@ function getSimulatedData() {
                 // Simulate analysis
                 await new Promise(resolve => setTimeout(resolve, 2000));
                 
-                const consumoPromedio = ocrData.consumo || Math.floor(Math.random() * 1500) + 800;
-                const facturaPromedio = ocrData.monto || Math.floor(consumoPromedio * 0.45 * CONFIG.financial.TC_BCCR);
+                const consumoPromedio = Math.floor(Math.random() * 1500) + 800;
+                const facturaPromedio = Math.floor(consumoPromedio * 0.45 * CONFIG.financial.TC_BCCR);
                 
                 const equipoRecomendado = selectEquipment(facturaPromedio);
                 const ahorroMensual = Math.floor(facturaPromedio * (CONFIG.financial.ahorroMinimo + Math.random() * 0.05));

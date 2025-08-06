@@ -1,0 +1,10 @@
+            // Procesar con OCR real
+            let ocrData = await getSimulatedData(); // Por defecto datos simulados
+            let ocrText = "Factor de Potencia: 0.88 Multa por bajo factor de potencia: ₡5,000";
+            
+            if (uploadedFiles.length > 0) {
+                console.log('🔍 Procesando imagen con OCR...');
+                ocrData = await processImageWithOCR(uploadedFiles[0]);
+                ocrText = ocrData.textoCompleto || ocrText;
+                console.log('✅ Datos OCR:', ocrData);
+            }
