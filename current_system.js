@@ -343,3 +343,4 @@ IBAN CRC: ${CONFIG.banking.ibanCRC}`;
 
         console.log('✅ Energy Saver Complete System loaded!');
     </script>
+        window.performAnalysis = performAnalysis;
