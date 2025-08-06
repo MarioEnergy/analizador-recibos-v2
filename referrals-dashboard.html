@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Referidos - Energy Saver Costa Rica</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto p-6">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-3xl font-bold text-gray-800">🎁 Dashboard de Referidos</h1>
+            <a href="index.html" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                ← Volver
+            </a>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <div class="bg-purple-100 p-6 rounded-lg">
+                <h3 class="text-lg font-bold text-purple-800">Total Referidos</h3>
+                <p class="text-3xl font-bold text-purple-600" id="totalReferrals">0</p>
+            </div>
+            <div class="bg-green-100 p-6 rounded-lg">
+                <h3 class="text-lg font-bold text-green-800">Referidos Activos</h3>
+                <p class="text-3xl font-bold text-green-600" id="activeReferrals">0</p>
+            </div>
+            <div class="bg-yellow-100 p-6 rounded-lg">
+                <h3 class="text-lg font-bold text-yellow-800">Bonos Ganados</h3>
+                <p class="text-3xl font-bold text-yellow-600" id="totalBonus">₡0</p>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div class="p-4 bg-purple-600 text-white">
+                <h2 class="text-xl font-bold">Top Referidores</h2>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="px-4 py-2 text-left">Nombre</th>
+                            <th class="px-4 py-2 text-left">Código</th>
+                            <th class="px-4 py-2 text-left">Total Referidos</th>
+                            <th class="px-4 py-2 text-left">Activos</th>
+                            <th class="px-4 py-2 text-left">Bonos Ganados</th>
+                        </tr>
+                    </thead>
+                    <tbody id="referralsTableBody">
+                        <!-- Los datos se cargarán aquí -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function loadReferralStats() {
+            const referrals = JSON.parse(localStorage.getItem('referrals') || '[]');
+            const analyses = JSON.parse(localStorage.getItem('energySaverAnalyses') || '[]');
+            
+            // Calcular estadísticas
+            const stats = {};
+            let totalReferrals = 0;
+            let activeReferrals = 0;
+            
+            // Agrupar por cliente con código
+            analyses.forEach(analysis => {
+                if (analysis.referralCode) {
+                    if (!stats[analysis.telefono]) {
+                        stats[analysis.telefono] = {
+                            name: analysis.nombre,
+                            code: analysis.referralCode,
+                            phone: analysis.telefono,
+                            totalReferrals: 0,
+                            activeReferrals: 0
+                        };
+                    }
+                }
+            });
+            
+            // Contar referidos
+            referrals.forEach(referral => {
+                totalReferrals++;
+                
+                // Buscar quién hizo el referido
+                Object.keys(stats).forEach(phone => {
+                    if (stats[phone].code === referral.referralCode) {
+                        stats[phone].totalReferrals++;
+                        
+                        // Verificar si está activo
+                        const isActive = analyses.some(a => 
+                            a.telefono === referral.referredPhone
+                        );
+                        if (isActive) {
+                            stats[phone].activeReferrals++;
+                            activeReferrals++;
+                        }
+                    }
+                });
+            });
+            
+            // Actualizar totales
+            document.getElementById('totalReferrals').textContent = totalReferrals;
+            document.getElementById('activeReferrals').textContent = activeReferrals;
+            document.getElementById('totalBonus').textContent = '₡' + (activeReferrals * 50000).toLocaleString();
+            
+            // Mostrar tabla
+            const tbody = document.getElementById('referralsTableBody');
+            const rows = Object.values(stats)
+                .filter(s => s.totalReferrals > 0)
+                .sort((a, b) => b.activeReferrals - a.activeReferrals);
+            
+            tbody.innerHTML = rows.length > 0 ? rows.map(stat => `
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="px-4 py-2">${stat.name}</td>
+                    <td class="px-4 py-2 font-mono">${stat.code}</td>
+                    <td class="px-4 py-2">${stat.totalReferrals}</td>
+                    <td class="px-4 py-2">${stat.activeReferrals}</td>
+                    <td class="px-4 py-2">₡${(stat.activeReferrals * 50000).toLocaleString()}</td>
+                </tr>
+            `).join('') : '<tr><td colspan="5" class="text-center py-4 text-gray-500">No hay referidos aún</td></tr>';
+        }
+        
+        // Cargar al iniciar
+        loadReferralStats();
+        
+        // Actualizar cada 5 segundos
+        setInterval(loadReferralStats, 5000);
+    </script>
+</body>
+</html>

@@ -382,7 +382,14 @@ function getSimulatedData() {
             `;
             
             document.getElementById('results-section').classList.remove('hidden');
-                    saveToGoogleSheets(currentAnalysis);
+            showReferralButton();
+            saveToGoogleSheets(currentAnalysis);
+            
+            // Guardar referido si existe código
+            const referralCode = document.getElementById("referral-code-input").value.trim();
+            if (referralCode) {
+                saveReferralIfExists(referralCode);
+            }
         }
 
         function generatePagare() {
@@ -559,59 +566,129 @@ IBAN CRC: ${CONFIG.banking.ibanCRC}`;
         // Exponer funciones
         window.requestOTP = requestOTP;
         window.verifyOTP = verifyOTP;
+// PARTE 1: Funciones básicas de referidos
+function showReferralButton() {
+    const content = document.getElementById('results-content');
+    if (!content) return;
+    
+    const btn = document.createElement('button');
+    btn.className = 'mt-4 bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700';
+    btn.innerHTML = '🎁 Ver Programa de Referidos';
+    btn.onclick = showReferralModal;
+    content.appendChild(btn);
+}
+
+function generateReferralCode() {
+    if (!currentAnalysis) return;
+    const name = currentAnalysis.cliente.nombre;
+    const prefix = name.substring(0, 3).toUpperCase();
+    const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+    return prefix + '-' + random;
+}
+// PARTE 2: Modal de referidos
+function showReferralModal() {
+    if (!currentAnalysis) return;
+    
+    const code = currentAnalysis.referralCode || generateReferralCode();
+    currentAnalysis.referralCode = code;
+    
+    const modal = document.createElement('div');
+    modal.id = 'referral-modal';
+    modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+    
+    const content = '<div class="bg-white rounded-lg p-8 max-w-md w-full mx-4">' +
+        '<h2 class="text-2xl font-bold text-gray-800 mb-4">🎁 Programa de Referidos</h2>' +
+        '<div class="bg-green-100 p-4 rounded-lg mb-4">' +
+        '<p class="text-sm text-gray-600 mb-2">Tu código de referido:</p>' +
+        '<p class="text-2xl font-bold text-green-600">' + code + '</p>' +
+        '</div>' +
+        '<div class="mb-6">' +
+        '<h3 class="font-bold text-gray-800 mb-2">¿Cómo funciona?</h3>' +
+        '<ul class="text-sm text-gray-600 space-y-2">' +
+        '<li>✅ Comparte tu código con amigos</li>' +
+        '<li>✅ Por cada referido: ₡50,000 de bono</li>' +
+        '<li>✅ Tu referido recibe: 5% descuento</li>' +
+        '<li>✅ Sin límite de referidos</li>' +
+        '</ul></div>' +
+        '<div class="flex gap-3">' +
+        '<button onclick="shareReferralWhatsApp(\'' + code + '\')" class="flex-1 bg-green-600 text-white py-3 rounded-lg">📱 Compartir</button>' +
+        '<button onclick="closeReferralModal()" class="flex-1 bg-gray-300 text-gray-700 py-3 rounded-lg">Cerrar</button>' +
+        '</div></div>';
+    
+    modal.innerHTML = content;
+    document.body.appendChild(modal);
+}
+// PARTE 3: Funciones de compartir y cerrar
+function closeReferralModal() {
+    const modal = document.getElementById('referral-modal');
+    if (modal) modal.remove();
+}
+
+function shareReferralWhatsApp(code) {
+    const text = '¡Hola! 👋\n\n' +
+        'Te comparto mi código de referido de Energy Saver: *' + code + '*\n\n' +
+        '✅ Ahorra hasta 25% en tu factura eléctrica\n' +
+        '✅ Obtén 5% de descuento con mi código\n' +
+        '✅ Financiamiento sin intereses\n\n' +
+        '¿Te interesa? Contacta al 8722-6666';
+    
+    const url = 'https://wa.me/?text=' + encodeURIComponent(text);
+    window.open(url, '_blank');
+}
+
+// Guardar referido si hay código
+function saveReferralIfExists(referralCode) {
+    const referralInput = document.getElementById('referral-code-input');
+    if (referralInput && referralCode) {
+        const referrals = JSON.parse(localStorage.getItem('referrals') || '[]');
+        referrals.push({
+            id: Date.now(),
+            timestamp: new Date().toISOString(),
+            referralCode: referralCode,
+            referredName: currentAnalysis.cliente.nombre,
+            referredPhone: currentAnalysis.cliente.telefono
+        });
+        localStorage.setItem('referrals', JSON.stringify(referrals));
+    }
+}
 
         // Google Sheets Integration
         async function saveToGoogleSheets(analysisData) {
             try {
-                console.log('💾 Guardando análisis en base de datos...');
+                console.log("💾 Guardando análisis en base de datos...");
                 
                 // Preparar datos para Google Sheets
                 const sheetData = {
-                    fecha: new Date().toLocaleString('es-CR'),
+                    fecha: new Date().toLocaleString("es-CR"),
                     nombre: analysisData.cliente.nombre,
                     telefono: analysisData.cliente.telefono,
-                    email: analysisData.cliente.email || 'No proporcionado',
+                    email: analysisData.cliente.email || "No proporcionado",
                     consumoKwh: analysisData.consumoPromedio,
                     gastoMensual: analysisData.facturaPromedio,
                     factorPotencia: analysisData.factorPotencia,
-                    tieneMulta: analysisData.tieneMulta ? 'SI' : 'NO',
+                    tieneMulta: analysisData.tieneMulta ? "SI" : "NO",
                     equipoRecomendado: analysisData.equipoRecomendado.name,
                     inversionTotal: analysisData.totalEquipo,
                     ahorroMensual: analysisData.ahorroTotal,
                     roiAnos: analysisData.roiAnos,
-                    estado: 'Nuevo',
-                    notas: ''
+                    estado: "Nuevo",
+                    notas: "",
+                    referralCode: analysisData.referralCode || ""
                 };
                 
                 // Por ahora guardamos en localStorage como base de datos temporal
-                const analyses = JSON.parse(localStorage.getItem('energySaverAnalyses') || '[]');
+                const analyses = JSON.parse(localStorage.getItem("energySaverAnalyses") || "[]");
                 analyses.push({
                     id: Date.now(),
                     ...sheetData
                 });
-                localStorage.setItem('energySaverAnalyses', JSON.stringify(analyses));
+                localStorage.setItem("energySaverAnalyses", JSON.stringify(analyses));
                 
-                console.log('✅ Análisis guardado exitosamente');
-                showNotification('✅ Análisis guardado en la base de datos');
+                console.log("✅ Análisis guardado exitosamente");
                 
                 return true;
             } catch (error) {
-                console.error('Error guardando análisis:', error);
-                showNotification('⚠️ Error al guardar análisis', 'error');
+                console.error("Error guardando análisis:", error);
                 return false;
             }
-        }
-        
-        // Función para mostrar notificaciones
-        function showNotification(message, type = 'success') {
-            const notification = document.createElement('div');
-            notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
-                type === 'success' ? 'bg-green-500' : 'bg-red-500'
-            } text-white`;
-            notification.textContent = message;
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.remove();
-            }, 3000);
         }
