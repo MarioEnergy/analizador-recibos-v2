@@ -48,7 +48,7 @@ const CONFIG_BACKUP = {
         TC_BCCR: 500,      // Tipo cambio fijo emergencia
         IVA: 0.13,         // 13%
         tarifaEléctrica: 0.45,  // Promedio CR
-        ahorroMinimo: 0.25,     // 25% mínimo
+        ahorroMinimo: 0.20,     // 25% mínimo
         periodoAnalisis: 25     // años
     },
     

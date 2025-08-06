@@ -68,8 +68,8 @@ class EnergySaverApp {
                         <div class="text-sm text-gray-600">Ahorro/mes</div>
                     </div>
                     <div class="bg-yellow-50 p-6 rounded-xl text-center">
-                        <div class="text-2xl font-bold text-yellow-600">${analysis.roiAnos} años</div>
-                        <div class="text-sm text-gray-600">Retorno Inversión</div>
+                        <div class="text-2xl font-bold text-yellow-600">${analysis.roiMeses}</div>
+                        <div class="text-sm text-gray-600">ROI meses</div>
                     </div>
                 </div>
                 
