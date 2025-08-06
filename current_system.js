@@ -195,6 +195,8 @@
                     totalEquipo,
                     roiMeses,
                     roiAnos: (roiMeses / 12).toFixed(1),
+                    proyeccion2Anos: ahorroMensual * 24,
+                    proyeccion3Anos: ahorroMensual * 36,
                     porcentajeAhorro: Math.round((ahorroMensual / facturaPromedio) * 100),
                     factorPotencia: detectPowerFactor(ocrText) || "0.92",
                     tienePenalidad: detectPowerFactorPenalty(ocrText),
@@ -245,6 +247,21 @@
                     <div class="bg-yellow-50 p-6 rounded-xl text-center">
                         <div class="text-2xl font-bold text-yellow-600">${analysis.roiAnos} años</div>
                         <div class="text-sm text-gray-600">Retorno Inversión</div>
+                    </div>
+                </div>
+                
+                <!-- Proyecciones de Ahorro -->
+                <div class="bg-gradient-to-r from-green-50 to-blue-50 p-6 rounded-xl mt-6">
+                    <h4 class="text-lg font-bold text-gray-800 mb-4">💰 Proyección de Ahorros</h4>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-green-600">₡${analysis.proyeccion2Anos.toLocaleString()}</div>
+                            <div class="text-sm text-gray-600">Ahorro en 2 años</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-blue-600">₡${analysis.proyeccion3Anos.toLocaleString()}</div>
+                            <div class="text-sm text-gray-600">Ahorro en 3 años</div>
+                        </div>
                     </div>
                 </div>
                 
