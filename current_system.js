@@ -397,3 +397,61 @@ IBAN CRC: ${CONFIG.banking.ibanCRC}`;
         }
         window.detectPowerFactor = detectPowerFactor;
         window.detectPowerFactorPenalty = detectPowerFactorPenalty;
+
+        // WhatsApp OTP Functions
+        function requestOTP() {
+            const phone = document.getElementById('phone-number').value.trim();
+            if (!phone || phone.length < 8) {
+                showOTPError('Ingresa un número válido');
+                return;
+            }
+            
+            const otp = Math.floor(100000 + Math.random() * 900000).toString();
+            const message = `Cliente ${phone} solicita OTP: ${otp}`;
+            const adminWhatsApp = '50687226666';
+            
+            // Guardar OTP
+            sessionStorage.setItem(`otp_${phone}`, JSON.stringify({
+                otp: otp,
+                expiry: Date.now() + 600000 // 10 minutos
+            }));
+            
+            // Abrir WhatsApp
+            window.open(`https://wa.me/${adminWhatsApp}?text=${encodeURIComponent(message)}`, '_blank');
+            
+            // Mostrar paso 2
+            document.getElementById('otp-step-1').classList.add('hidden');
+            document.getElementById('otp-step-2').classList.remove('hidden');
+        }
+        
+        function verifyOTP() {
+            const phone = document.getElementById('phone-number').value.trim();
+            const inputOTP = document.getElementById('otp-code').value.trim();
+            
+            const stored = sessionStorage.getItem(`otp_${phone}`);
+            if (!stored) {
+                showOTPError('Código expirado. Solicita uno nuevo.');
+                return;
+            }
+            
+            const { otp, expiry } = JSON.parse(stored);
+            if (Date.now() > expiry || otp !== inputOTP) {
+                showOTPError('Código inválido o expirado');
+                return;
+            }
+            
+            // Login exitoso
+            sessionStorage.removeItem(`otp_${phone}`);
+            document.getElementById('otp-screen').classList.add('hidden');
+            showDashboard();
+        }
+        
+        function showOTPError(message) {
+            const errorEl = document.getElementById('otp-error');
+            errorEl.textContent = message;
+            errorEl.classList.remove('hidden');
+        }
+        
+        // Exponer funciones
+        window.requestOTP = requestOTP;
+        window.verifyOTP = verifyOTP;

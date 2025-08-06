@@ -28,6 +28,30 @@
         <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md fade-in">
             <div class="text-center mb-8">
                 <div class="text-5xl mb-4">🔋</div>
+            <!-- OTP Screen -->
+            <div id="otp-screen" class="hidden fixed inset-0 gradient-bg flex items-center justify-center z-50">
+                <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 fade-in">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-6 text-center">📱 Verificación WhatsApp</h2>
+                    <div id="otp-step-1">
+                        <input type="tel" id="phone-number" placeholder="Teléfono (8888-8888)" 
+                               class="w-full px-4 py-3 border rounded-lg mb-4">
+                        <button onclick="requestOTP()" 
+                                class="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700">
+                            Solicitar Código WhatsApp
+                        </button>
+                    </div>
+                    <div id="otp-step-2" class="hidden">
+                        <p class="text-sm text-gray-600 mb-4">Código enviado. Revisa WhatsApp.</p>
+                        <input type="text" id="otp-code" placeholder="Código de 6 dígitos" 
+                               class="w-full px-4 py-3 border rounded-lg mb-4">
+                        <button onclick="verifyOTP()" 
+                                class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700">
+                            Verificar Código
+                        </button>
+                    </div>
+                    <div id="otp-error" class="hidden mt-4 p-3 bg-red-100 text-red-700 rounded-lg"></div>
+                </div>
+            </div>
                 <h1 class="text-3xl font-bold text-gray-800">Energy Saver</h1>
                 <p class="text-gray-600">Costa Rica - Sistema V2.0</p>
             </div>
@@ -47,7 +71,7 @@
                            value="mario123" required>
                 </div>
                 
-                <button type="button" onclick="handleLogin()" 
+                <button type="button" onclick="document.getElementById('login-screen').classList.add('hidden'); document.getElementById('otp-screen').classList.remove('hidden');" 
                         class="w-full bg-blue-600 text-white p-4 rounded-xl font-bold text-lg hover:bg-blue-700 transition-all transform hover:scale-105">
                     🔑 Iniciar Sesión
                 </button>
