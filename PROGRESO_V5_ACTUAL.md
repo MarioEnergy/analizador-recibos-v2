@@ -9,7 +9,7 @@
 4. ✅ ROI simplificado
 5. ✅ Proyecciones 2-3 años
 6. ✅ WhatsApp OTP
-7. ⏳ Gráficos consumo
+7. ✅ Gráficos consumo + Widget WhatsApp
 8. ⏳ Programa referidos
 9. ⏳ Botón compra directa
 10. ⏳ Base datos clientes

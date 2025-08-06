@@ -9,3 +9,4 @@ Wed Aug  6 05:03:40 AM UTC 2025
 Wed Aug  6 05:08:19 AM UTC 2025
 ✅ Proyecciones 2-3 años: Visualización de ahorros futuros
 ✅ WhatsApp OTP: Sistema de verificación por WhatsApp
+✅ Widget WhatsApp flotante: Botón con mensaje pre-escrito
