@@ -163,9 +163,6 @@
     </div>
 
     <script type="module">
-        // Sistema Resiliencia V4.0
-        import initializeResilience from "./resilience/index.js";
-        window.initResilience = initializeResilience;
         import EnergySaverApp from "./modules/app/app.js";
         
         // Initialize modular system
