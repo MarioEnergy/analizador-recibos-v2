@@ -382,7 +382,6 @@ function getSimulatedData() {
             `;
             
             document.getElementById('results-section').classList.remove('hidden');
-                    saveToGoogleSheets(currentAnalysis);
         }
 
         function generatePagare() {
@@ -559,59 +558,3 @@ IBAN CRC: ${CONFIG.banking.ibanCRC}`;
         // Exponer funciones
         window.requestOTP = requestOTP;
         window.verifyOTP = verifyOTP;
-
-        // Google Sheets Integration
-        async function saveToGoogleSheets(analysisData) {
-            try {
-                console.log('💾 Guardando análisis en base de datos...');
-                
-                // Preparar datos para Google Sheets
-                const sheetData = {
-                    fecha: new Date().toLocaleString('es-CR'),
-                    nombre: analysisData.cliente.nombre,
-                    telefono: analysisData.cliente.telefono,
-                    email: analysisData.cliente.email || 'No proporcionado',
-                    consumoKwh: analysisData.consumoPromedio,
-                    gastoMensual: analysisData.facturaPromedio,
-                    factorPotencia: analysisData.factorPotencia,
-                    tieneMulta: analysisData.tieneMulta ? 'SI' : 'NO',
-                    equipoRecomendado: analysisData.equipoRecomendado.name,
-                    inversionTotal: analysisData.totalEquipo,
-                    ahorroMensual: analysisData.ahorroTotal,
-                    roiAnos: analysisData.roiAnos,
-                    estado: 'Nuevo',
-                    notas: ''
-                };
-                
-                // Por ahora guardamos en localStorage como base de datos temporal
-                const analyses = JSON.parse(localStorage.getItem('energySaverAnalyses') || '[]');
-                analyses.push({
-                    id: Date.now(),
-                    ...sheetData
-                });
-                localStorage.setItem('energySaverAnalyses', JSON.stringify(analyses));
-                
-                console.log('✅ Análisis guardado exitosamente');
-                showNotification('✅ Análisis guardado en la base de datos');
-                
-                return true;
-            } catch (error) {
-                console.error('Error guardando análisis:', error);
-                showNotification('⚠️ Error al guardar análisis', 'error');
-                return false;
-            }
-        }
-        
-        // Función para mostrar notificaciones
-        function showNotification(message, type = 'success') {
-            const notification = document.createElement('div');
-            notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 ${
-                type === 'success' ? 'bg-green-500' : 'bg-red-500'
-            } text-white`;
-            notification.textContent = message;
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.remove();
-            }, 3000);
-        }

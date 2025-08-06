@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Energy Saver Costa Rica</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto p-6">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6">📊 Dashboard de Análisis</h1>
+        
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div class="p-4 bg-green-600 text-white">
+                <h2 class="text-xl font-bold">Análisis Guardados</h2>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="px-4 py-2 text-left">Fecha</th>
+                            <th class="px-4 py-2 text-left">Cliente</th>
+                            <th class="px-4 py-2 text-left">Teléfono</th>
+                            <th class="px-4 py-2 text-left">Consumo kWh</th>
+                            <th class="px-4 py-2 text-left">Gasto ₡</th>
+                            <th class="px-4 py-2 text-left">Equipo</th>
+                            <th class="px-4 py-2 text-left">Ahorro ₡</th>
+                            <th class="px-4 py-2 text-left">Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="analysisTableBody">
+                        <!-- Los datos se cargarán aquí -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-blue-100 p-6 rounded-lg">
+                <h3 class="text-lg font-bold text-blue-800">Total Análisis</h3>
+                <p class="text-3xl font-bold text-blue-600" id="totalAnalyses">0</p>
+            </div>
+            <div class="bg-green-100 p-6 rounded-lg">
+                <h3 class="text-lg font-bold text-green-800">Ahorro Total Proyectado</h3>
+                <p class="text-3xl font-bold text-green-600" id="totalSavings">₡0</p>
+            </div>
+            <div class="bg-purple-100 p-6 rounded-lg">
+                <h3 class="text-lg font-bold text-purple-800">Consumo Promedio</h3>
+                <p class="text-3xl font-bold text-purple-600" id="avgConsumption">0 kWh</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function loadAnalyses() {
+            const analyses = JSON.parse(localStorage.getItem('energySaverAnalyses') || '[]');
+            const tbody = document.getElementById('analysisTableBody');
+            
+            tbody.innerHTML = analyses.map(analysis => `
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="px-4 py-2">${analysis.fecha}</td>
+                    <td class="px-4 py-2">${analysis.nombre}</td>
+                    <td class="px-4 py-2">${analysis.telefono}</td>
+                    <td class="px-4 py-2">${analysis.consumoKwh}</td>
+                    <td class="px-4 py-2">₡${analysis.gastoMensual.toLocaleString()}</td>
+                    <td class="px-4 py-2">${analysis.equipoRecomendado}</td>
+                    <td class="px-4 py-2">₡${analysis.ahorroMensual.toLocaleString()}</td>
+                    <td class="px-4 py-2">
+                        <span class="px-2 py-1 bg-green-200 text-green-800 rounded text-sm">
+                            ${analysis.estado}
+                        </span>
+                    </td>
+                </tr>
+            `).join('');
+            
+            // Calcular estadísticas
+            document.getElementById('totalAnalyses').textContent = analyses.length;
+            
+            const totalSavings = analyses.reduce((sum, a) => sum + a.ahorroMensual, 0);
+            document.getElementById('totalSavings').textContent = `₡${totalSavings.toLocaleString()}`;
+            
+            const avgConsumption = analyses.length > 0 
+                ? Math.round(analyses.reduce((sum, a) => sum + a.consumoKwh, 0) / analyses.length)
+                : 0;
+            document.getElementById('avgConsumption').textContent = `${avgConsumption} kWh`;
+        }
+        
+        // Cargar datos al iniciar
+        loadAnalyses();
+        
+        // Actualizar cada 5 segundos
+        setInterval(loadAnalyses, 5000);
+    </script>
+</body>
+</html>
