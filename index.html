@@ -201,9 +201,11 @@
         import initializeResilience from "./resilience/index.js";
         window.initResilience = initializeResilience;
         import EnergySaverApp from "./modules/app/app.js";
+        import WhatsAppOTP from "./modules/auth/whatsapp-otp.js";
         
         // Initialize modular system
         window.energySaverApp = new EnergySaverApp();
+        window.whatsAppOTP = WhatsAppOTP;
         
         // Start application
         document.addEventListener("DOMContentLoaded", function() {
@@ -276,6 +278,148 @@
         }
         });
     </script>
+
+    <!-- Global OTP Functions -->
+    <script>
+        // WhatsApp OTP System - Global functions for immediate availability
+        const WhatsAppOTPGlobal = {
+            currentPhone: null,
+            
+            generateOTP: () => {
+                return Math.floor(100000 + Math.random() * 900000).toString();
+            },
+            
+            storeOTP: (phone, otp) => {
+                const expiry = Date.now() + (10 * 60 * 1000);
+                sessionStorage.setItem(`otp_${phone}`, JSON.stringify({ otp, expiry }));
+            },
+            
+            verifyOTP: (phone, inputOTP) => {
+                const stored = sessionStorage.getItem(`otp_${phone}`);
+                if (!stored) return false;
+                
+                const { otp, expiry } = JSON.parse(stored);
+                if (Date.now() > expiry) {
+                    sessionStorage.removeItem(`otp_${phone}`);
+                    return false;
+                }
+                
+                return otp === inputOTP;
+            }
+        };
+
+        // Global functions for HTML onclick handlers
+        function requestOTP() {
+            const phoneInput = document.getElementById('phone-number');
+            const phone = phoneInput.value.trim().replace(/\D/g, '');
+            
+            if (!phone || phone.length < 8) {
+                document.getElementById('otp-error').textContent = 'Número de teléfono inválido';
+                document.getElementById('otp-error').classList.remove('hidden');
+                return;
+            }
+            
+            // Generate OTP
+            const otp = WhatsAppOTPGlobal.generateOTP();
+            WhatsAppOTPGlobal.currentPhone = phone;
+            WhatsAppOTPGlobal.storeOTP(phone, otp);
+            
+            console.log(`📱 OTP generado para ${phone}: ${otp}`);
+            
+            // Show step 2
+            document.getElementById('otp-step-1').classList.add('hidden');
+            document.getElementById('otp-step-2').classList.remove('hidden');
+            document.getElementById('otp-error').classList.add('hidden');
+            
+            // For testing: show the code
+            alert(`🔐 Código de prueba: ${otp}\n(En producción se enviaría por WhatsApp)`);
+        }
+
+        function verifyOTP() {
+            const otpInput = document.getElementById('otp-code');
+            const code = otpInput.value.trim();
+            
+            if (!code || code.length !== 6) {
+                document.getElementById('otp-error').textContent = 'Código debe tener 6 dígitos';
+                document.getElementById('otp-error').classList.remove('hidden');
+                return;
+            }
+            
+            if (WhatsAppOTPGlobal.verifyOTP(WhatsAppOTPGlobal.currentPhone, code)) {
+                // OTP correct - go to dashboard
+                document.getElementById('otp-screen').classList.add('hidden');
+                document.getElementById('dashboard').classList.remove('hidden');
+                
+                // Simulate authenticated user
+                const user = {
+                    id: 1,
+                    name: 'Usuario Verificado',
+                    phone: WhatsAppOTPGlobal.currentPhone,
+                    role: 'user',
+                    loginTime: new Date().toISOString()
+                };
+                localStorage.setItem('energySaverUser', JSON.stringify(user));
+                
+                // Update user info
+                const userNameElement = document.getElementById('user-name');
+                const userRoleElement = document.getElementById('user-role');
+                if (userNameElement) userNameElement.textContent = user.name;
+                if (userRoleElement) userRoleElement.textContent = user.role;
+                
+                console.log('✅ OTP verificado exitosamente');
+            } else {
+                document.getElementById('otp-error').textContent = 'Código incorrecto o expirado';
+                document.getElementById('otp-error').classList.remove('hidden');
+            }
+        }
+
+        // File handling functions
+        function handleFileSelect(event) {
+            const files = Array.from(event.target.files);
+            window.uploadedFiles = files;
+            
+            const statusDiv = document.getElementById('files-status');
+            if (files.length > 0) {
+                statusDiv.innerHTML = files.map(file => `
+                    <div class="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
+                        <div class="flex items-center space-x-3">
+                            <div class="text-green-600">📄</div>
+                            <div>
+                                <div class="font-medium text-green-800">${file.name}</div>
+                                <span class="text-sm text-gray-500">(${(file.size / 1024 / 1024).toFixed(1)} MB)</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                console.log('✅ Archivos cargados:', files.length);
+            }
+            checkAnalysisReady();
+        }
+
+        function checkAnalysisReady() {
+            const name = document.getElementById('client-name').value.trim();
+            const phone = document.getElementById('client-phone').value.trim();
+            const hasFiles = window.uploadedFiles && window.uploadedFiles.length > 0;
+            
+            const analyzeBtn = document.getElementById('analyze-btn');
+            if (analyzeBtn) {
+                analyzeBtn.disabled = !(name && phone && hasFiles);
+            }
+        }
+
+        // Analysis functions will be available when modules load
+        window.uploadedFiles = [];
+
+        // Setup input event listeners when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            const nameInput = document.getElementById('client-name');
+            const phoneInput = document.getElementById('client-phone');
+            
+            if (nameInput) nameInput.addEventListener('input', checkAnalysisReady);
+            if (phoneInput) phoneInput.addEventListener('input', checkAnalysisReady);
+        });
+    </script>
+
 <script src="social-widgets.js"></script>
 </body>
 </html>
