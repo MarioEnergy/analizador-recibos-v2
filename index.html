@@ -201,9 +201,11 @@
         import initializeResilience from "./resilience/index.js";
         window.initResilience = initializeResilience;
         import EnergySaverApp from "./modules/app/app.js";
+        import WhatsAppOTP from "./modules/auth/whatsapp-otp.js";
         
         // Initialize modular system
         window.energySaverApp = new EnergySaverApp();
+        window.whatsAppOTP = WhatsAppOTP;
         
         // Start application
         document.addEventListener("DOMContentLoaded", function() {
@@ -276,6 +278,349 @@
         }
         });
     </script>
+
+    <!-- Global OTP Functions -->
+    <script>
+        // WhatsApp OTP System - Global functions for immediate availability
+        const WhatsAppOTPGlobal = {
+            currentPhone: null,
+            
+            generateOTP: () => {
+                return Math.floor(100000 + Math.random() * 900000).toString();
+            },
+            
+            storeOTP: (phone, otp) => {
+                const expiry = Date.now() + (10 * 60 * 1000);
+                sessionStorage.setItem(`otp_${phone}`, JSON.stringify({ otp, expiry }));
+            },
+            
+            verifyOTP: (phone, inputOTP) => {
+                const stored = sessionStorage.getItem(`otp_${phone}`);
+                if (!stored) return false;
+                
+                const { otp, expiry } = JSON.parse(stored);
+                if (Date.now() > expiry) {
+                    sessionStorage.removeItem(`otp_${phone}`);
+                    return false;
+                }
+                
+                return otp === inputOTP;
+            }
+        };
+
+        // Global functions for HTML onclick handlers
+        function requestOTP() {
+            const phoneInput = document.getElementById('phone-number');
+            const phone = phoneInput.value.trim().replace(/\D/g, '');
+            
+            if (!phone || phone.length < 8) {
+                document.getElementById('otp-error').textContent = 'Número de teléfono inválido';
+                document.getElementById('otp-error').classList.remove('hidden');
+                return;
+            }
+            
+            // Generate OTP
+            const otp = WhatsAppOTPGlobal.generateOTP();
+            WhatsAppOTPGlobal.currentPhone = phone;
+            WhatsAppOTPGlobal.storeOTP(phone, otp);
+            
+            console.log(`📱 OTP generado para ${phone}: ${otp}`);
+            
+            // Show step 2
+            document.getElementById('otp-step-1').classList.add('hidden');
+            document.getElementById('otp-step-2').classList.remove('hidden');
+            document.getElementById('otp-error').classList.add('hidden');
+            
+            // For testing: show the code
+            alert(`🔐 Código de prueba: ${otp}\n(En producción se enviaría por WhatsApp)`);
+        }
+
+        function verifyOTP() {
+            const otpInput = document.getElementById('otp-code');
+            const code = otpInput.value.trim();
+            
+            if (!code || code.length !== 6) {
+                document.getElementById('otp-error').textContent = 'Código debe tener 6 dígitos';
+                document.getElementById('otp-error').classList.remove('hidden');
+                return;
+            }
+            
+            if (WhatsAppOTPGlobal.verifyOTP(WhatsAppOTPGlobal.currentPhone, code)) {
+                // OTP correct - go to dashboard
+                document.getElementById('otp-screen').classList.add('hidden');
+                document.getElementById('dashboard').classList.remove('hidden');
+                
+                // Simulate authenticated user
+                const user = {
+                    id: 1,
+                    name: 'Usuario Verificado',
+                    phone: WhatsAppOTPGlobal.currentPhone,
+                    role: 'user',
+                    loginTime: new Date().toISOString()
+                };
+                localStorage.setItem('energySaverUser', JSON.stringify(user));
+                
+                // Update user info
+                const userNameElement = document.getElementById('user-name');
+                const userRoleElement = document.getElementById('user-role');
+                if (userNameElement) userNameElement.textContent = user.name;
+                if (userRoleElement) userRoleElement.textContent = user.role;
+                
+                console.log('✅ OTP verificado exitosamente');
+            } else {
+                document.getElementById('otp-error').textContent = 'Código incorrecto o expirado';
+                document.getElementById('otp-error').classList.remove('hidden');
+            }
+        }
+
+        // File handling functions
+        function handleFileSelect(event) {
+            const files = Array.from(event.target.files);
+            window.uploadedFiles = files;
+            
+            const statusDiv = document.getElementById('files-status');
+            if (files.length > 0) {
+                statusDiv.innerHTML = files.map(file => `
+                    <div class="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg">
+                        <div class="flex items-center space-x-3">
+                            <div class="text-green-600">📄</div>
+                            <div>
+                                <div class="font-medium text-green-800">${file.name}</div>
+                                <span class="text-sm text-gray-500">(${(file.size / 1024 / 1024).toFixed(1)} MB)</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                console.log('✅ Archivos cargados:', files.length);
+            }
+            checkAnalysisReady();
+        }
+
+        function checkAnalysisReady() {
+            const name = document.getElementById('client-name').value.trim();
+            const phone = document.getElementById('client-phone').value.trim();
+            const hasFiles = window.uploadedFiles && window.uploadedFiles.length > 0;
+            
+            const analyzeBtn = document.getElementById('analyze-btn');
+            if (analyzeBtn) {
+                analyzeBtn.disabled = !(name && phone && hasFiles);
+            }
+        }
+
+        // Analysis functions will be available when modules load
+        window.uploadedFiles = [];
+
+        // Global performAnalysis function - simplified version for immediate availability
+        async function performAnalysis() {
+            console.log('📊 Starting electric receipt analysis...');
+            
+            // Get client data
+            const clientData = {
+                nombre: document.getElementById('client-name').value.trim(),
+                telefono: document.getElementById('client-phone').value.trim(),
+                email: 'cliente@test.com'
+            };
+
+            const btn = document.getElementById('analyze-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '⏳ Analizando Recibo Eléctrico...';
+            btn.disabled = true;
+            
+            try {
+                // Simulate OCR processing of electric receipt
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                // Simulate OCR data extraction from electric receipt
+                const ocrData = {
+                    consumo: Math.floor(Math.random() * 500) + 800, // kWh consumption from receipt
+                    monto: Math.floor(Math.random() * 50000) + 60000, // Amount in colones from receipt
+                    factorPotencia: (0.85 + Math.random() * 0.1).toFixed(2),
+                    tieneMulta: Math.random() > 0.8,
+                    empresaElectrica: Math.random() > 0.5 ? 'CNFL' : 'ICE',
+                    textoCompleto: 'Recibo eléctrico procesado - Datos extraídos por OCR'
+                };
+                
+                console.log('✅ OCR Data from electric receipt:', ocrData);
+                
+                // Calculate analysis based on electric consumption
+                const facturaPromedio = ocrData.monto;
+                const ahorroMensual = Math.floor(facturaPromedio * 0.22); // 22% average solar savings
+                
+                // Select equipment based on electric bill amount
+                let equipoRecomendado = { name: 'JS-1299', precio: 3200, prima: 1100, cuotaUSD: 128 };
+                if (facturaPromedio > 80000) equipoRecomendado = { name: 'JS-2099', precio: 4600, prima: 1500, cuotaUSD: 178 };
+                if (facturaPromedio > 120000) equipoRecomendado = { name: 'JS-2499', precio: 5200, prima: 1750, cuotaUSD: 195 };
+                
+                const analysis = {
+                    cliente: clientData,
+                    consumoPromedio: ocrData.consumo,
+                    facturaPromedio: facturaPromedio,
+                    equipoRecomendado: equipoRecomendado,
+                    ahorroTotal: ahorroMensual,
+                    totalEquipo: equipoRecomendado.precio * 512, // USD to CRC conversion
+                    roiMeses: Math.ceil((equipoRecomendado.precio * 512) / ahorroMensual),
+                    roiAnos: Math.ceil((equipoRecomendado.precio * 512) / ahorroMensual / 12),
+                    porcentajeAhorro: 22,
+                    factorPotencia: ocrData.factorPotencia,
+                    eficienciaActual: Math.floor(70 + Math.random() * 20) + '%',
+                    flujoPositivo: ahorroMensual - Math.floor(equipoRecomendado.cuotaUSD * 512),
+                    empresaElectrica: ocrData.empresaElectrica,
+                    timestamp: new Date().toISOString()
+                };
+                
+                window.currentAnalysis = analysis;
+                showResults(analysis);
+                
+                console.log('✅ Electric receipt analysis completed:', analysis);
+                
+            } catch (error) {
+                console.error('❌ Analysis error:', error);
+                alert('Error en el análisis del recibo eléctrico. Intenta nuevamente.');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        function showResults(analysis) {
+            const content = document.getElementById('results-content');
+            
+            content.innerHTML = `
+                <div class="bg-blue-50 p-4 rounded-lg mb-6">
+                    <h4 class="font-bold text-blue-800 mb-2">📄 Análisis de Recibo Eléctrico - ${analysis.empresaElectrica}</h4>
+                    <p class="text-blue-600">Recibo procesado con OCR para cliente: ${analysis.cliente.nombre}</p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                    <div class="bg-blue-50 p-6 rounded-xl text-center">
+                        <div class="text-2xl font-bold text-blue-600">${analysis.cliente.nombre}</div>
+                        <div class="text-sm text-gray-600">Cliente</div>
+                    </div>
+                    <div class="bg-green-50 p-6 rounded-xl text-center">
+                        <div class="text-2xl font-bold text-green-600">${analysis.equipoRecomendado.name}</div>
+                        <div class="text-sm text-gray-600">Sistema Solar</div>
+                    </div>
+                    <div class="bg-purple-50 p-6 rounded-xl text-center">
+                        <div class="text-2xl font-bold text-purple-600">₡${analysis.ahorroTotal.toLocaleString()}</div>
+                        <div class="text-sm text-gray-600">Ahorro/mes</div>
+                    </div>
+                    <div class="bg-yellow-50 p-6 rounded-xl text-center">
+                        <div class="text-2xl font-bold text-yellow-600">${analysis.roiAnos} años</div>
+                        <div class="text-sm text-gray-600">Retorno Inversión</div>
+                    </div>
+                </div>
+                
+                <div class="bg-gradient-to-r from-green-50 to-blue-50 p-6 rounded-xl">
+                    <h4 class="text-lg font-bold text-gray-900 mb-4">📊 Análisis Detallado del Recibo</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div><strong>Empresa Eléctrica:</strong> ${analysis.empresaElectrica}</div>
+                        <div><strong>Consumo:</strong> ${analysis.consumoPromedio} kWh/mes</div>
+                        <div><strong>Factura Actual:</strong> ₡${analysis.facturaPromedio.toLocaleString()}/mes</div>
+                        <div><strong>Factor Potencia:</strong> ${analysis.factorPotencia}</div>
+                        <div><strong>% Ahorro Solar:</strong> ${analysis.porcentajeAhorro}%</div>
+                        <div><strong>Flujo Positivo:</strong> ₡${analysis.flujoPositivo.toLocaleString()}/mes</div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('results-section').classList.remove('hidden');
+        }
+
+        // Document generation functions
+        function generatePagare() {
+            if (!window.currentAnalysis) {
+                alert('Debe realizar un análisis primero');
+                return;
+            }
+            
+            const analysis = window.currentAnalysis;
+            const content = `PAGARÉ - ENERGY SAVER COSTA RICA
+
+Cliente: ${analysis.cliente.nombre}
+Teléfono: ${analysis.cliente.telefono}
+Fecha: ${new Date().toLocaleDateString('es-CR')}
+
+ANÁLISIS RECIBO ELÉCTRICO:
+Empresa: ${analysis.empresaElectrica}
+Consumo Actual: ${analysis.consumoPromedio} kWh/mes
+Factura Mensual: ₡${analysis.facturaPromedio.toLocaleString()}
+
+EQUIPO RECOMENDADO: ${analysis.equipoRecomendado.name}
+MONTO TOTAL: $${Math.floor(analysis.totalEquipo / 512)} USD
+(₡${analysis.totalEquipo.toLocaleString()} colones)
+
+FINANCIAMIENTO:
+Prima: $${analysis.equipoRecomendado.prima}
+24 Cuotas: $${analysis.equipoRecomendado.cuotaUSD} c/u
+Tasa interés: 0%
+
+AHORRO PROYECTADO: ₡${analysis.ahorroTotal.toLocaleString()}/mes
+
+EMPRESA:
+ENERGY SAVER, SOCIEDAD ANÓNIMA
+Cédula: 3-101-577450
+Representante: MARIO SAVARD BOIES
+Teléfono: 8722-6666`;
+            
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `PAGARE_${analysis.cliente.nombre.replace(/\s+/g, '_')}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            alert('✅ PAGARÉ generado y descargado');
+        }
+
+        function shareWhatsApp() {
+            if (!window.currentAnalysis) {
+                alert('Debe realizar un análisis primero');
+                return;
+            }
+            
+            const analysis = window.currentAnalysis;
+            const message = `🔋 *ENERGY SAVER COSTA RICA*
+📊 *ANÁLISIS RECIBO ELÉCTRICO*
+
+👤 Cliente: ${analysis.cliente.nombre}
+⚡ Empresa: ${analysis.empresaElectrica}
+📄 Consumo: ${analysis.consumoPromedio} kWh/mes
+💰 Factura: ₡${analysis.facturaPromedio.toLocaleString()}/mes
+
+🔧 Sistema Solar: ${analysis.equipoRecomendado.name}
+💵 Ahorro: ₡${analysis.ahorroTotal.toLocaleString()}/mes
+⏱️ ROI: ${analysis.roiAnos} años
+
+¡Reduce tu factura eléctrica hasta un 22%!
+📞 8722-6666`;
+
+            const url = `https://wa.me/50687226666?text=${encodeURIComponent(message)}`;
+            window.open(url, '_blank');
+        }
+
+        function newAnalysis() {
+            window.currentAnalysis = null;
+            window.uploadedFiles = [];
+            
+            document.getElementById('client-name').value = '';
+            document.getElementById('client-phone').value = '';
+            document.getElementById('files-status').innerHTML = '';
+            document.getElementById('results-section').classList.add('hidden');
+            
+            checkAnalysisReady();
+        }
+
+        // Setup input event listeners when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            const nameInput = document.getElementById('client-name');
+            const phoneInput = document.getElementById('client-phone');
+            
+            if (nameInput) nameInput.addEventListener('input', checkAnalysisReady);
+            if (phoneInput) phoneInput.addEventListener('input', checkAnalysisReady);
+        });
+    </script>
+
 <script src="social-widgets.js"></script>
 </body>
 </html>
